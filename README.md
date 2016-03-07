@@ -10,7 +10,7 @@ The first workflow uses SPAdes v.3.7 for de novo assembly of reads and PROKKA fo
      * You only need to provide a value of 1 for kingdom if you are annotating viruses.
 
 ### Example annotation file  
-### strain	 locustag	 centre	 genus	      species	plasmid	kingdom
+    strain	 locustag	 centre	 genus	      species	plasmid	kingdom
     strainA	 xxx	     centre	 Escherichia	coli		
     strainB	 yyy	     centre  Escherichia	coli	  p90
   
