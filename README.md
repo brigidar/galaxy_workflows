@@ -12,7 +12,7 @@ The first workflow uses SPAdes v.3.7 for *de novo* assembly of reads and PROKKA 
 ### Example annotation file  
     strain	 locustag	 centre	 genus	      species	plasmid	kingdom
     strainA	 xxx	     centre	 Escherichia	coli		
-    strainB	 yyy	     centre  Escherichia	coli	  p90
+    strainB	 yyy	     centre  Escherichia	coli	   p90
   
 
 
@@ -33,9 +33,9 @@ If you have a close reference with known mobilome and repeated regions this step
 
 
 #### Example bed file
-NC_011353.1	273971	274038
-NC_011353.1	275213	276349
-NC_011353.1	302573	314525
+    NC_011353.1	273971	274038
+    NC_011353.1	275213	276349
+    NC_011353.1	302573	314525
 
 If you are working with a draft genome: 
  * Identify IS elements with ISFinder and create a multifasta file
@@ -66,9 +66,9 @@ SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list
 If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a bed formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use PHAST for phage region prediction and save regions as bed formatted file. Use ISFinder to predict IS elements. If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). Once you have them use the **closed genomes excluded regions**.
 
 #### Example bed file
-NC_011353.1	273971	274038
-NC_011353.1	275213	276349
-NC_011353.1	302573	314525
+    NC_011353.1	273971	274038
+    NC_011353.1	275213	276349
+    NC_011353.1	302573	314525
 
 If you are working with a draft genome: 
  * Identify IS elements with ISFinder and create a multifasta file
@@ -84,6 +84,16 @@ If you choose the threaded version you can increase the threads to the total amo
 filtered table and a multifasta with the curated SNPs for each query genome.
   * If you have both reads and draft genomes in our queries you can combine them at this step to get all the SNPs in one single merged table.
  The output is a filtered table and a multifasta with the curated SNPs for each query genome.
+
+#### Example filtered SNP table
+    molecule	   refpos	syn?	refbase	qbase:abht	gene name	         gene start	gene end	gene length	snps per gene	pos in gene	ref codon/
+    NZ CM000662	101797	NSYN	A	      T	         ESCCO14588_RS26480	101814	    101644	  171	        1	            18	         TTA	
+    
+    //ref aa query codon	query aa	transition/transversion	snps/gene length	dn/ds	num_hits:abht	maxlen:abht	blengths:abht	product
+      L      TTT	        F	       transversion	           0.005847953	     1:00	 1	            40	         40	           hypothetical
+
+The table not only provides the SNP, but also the corresponding annotation from the reference genome. It provides the length of the
+blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts).
 
 ### C4 Post-processing (optional)
 The SNPs multifasta is converted to phylip to run on PhyML. The filtered table is processed to provide genotypes and summary
