@@ -25,10 +25,10 @@ The SNP discovery is reference based and you will need to define the mobilome wi
 For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads and 
 assembled contigs.
 
-### B1 Bowtie2 Mapping & Freebayes discovery
+### B1 Bowtie2 Mapping & Freebayes Discovery
 If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 
-### B2 Excluded regions
+### B2 Excluded Regions
 If you have a close reference with known mobilome regions this step can be skipped. Provide a bed formatted file with the coordinates
 of the rgions to exclude. 
 If you are working with a draft genome: 
@@ -39,5 +39,13 @@ If you are working with a draft genome:
 If your species does not have some of these mobile elements you can modify the workflow to remove them.
 
 ### B3 Verify SNPs
-You will need a fasta and genbank file of the reference, the excluded regions, and the predicted SNPs.
-for the species of interest. 
+You will need a fasta and genbank file of the reference, the excluded regions, and the predicted SNPs
+for the species of interest. You will need the assemblies of the query genomes as separate fasta files and concatenated.
+If you choose the threaded version you can increase the threads to the total amount of query genomes. The output is a 
+filtered table and a multifasta with the curated SNPs for each query genome.
+
+### B4 Post-processing
+The SNPs multifasta is converted to phylip to run on PhyML. The filtered table is processed to provide genotypes and summary
+of SNP characteristics.
+
+
