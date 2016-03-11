@@ -28,85 +28,42 @@ The first workflow uses SPAdes v.3.7 for *de novo* assembly of reads and PROKKA 
    * For more information on PROKKA please refer to the [github repository] (https://github.com/tseemann/prokka)
    * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
 
-##### Example annotation file  
+###### Example annotation file  
     strain	 locustag	 centre	 genus	      species	plasmid	kingdom
     strainA	 xxx	     centre	 Escherichia	coli		
     strainB	 yyy	     centre  Escherichia	coli	   p90
   
 
-## Excluding Mobilome Regions in SNPDV
+### SNPDV (workflows B)
 
-###**Excluding with a closed reference:**
-If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a bed formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use PHAST for phage regions prediction and save regions as bed formatted file. Use ISFinder to predict IS elements. If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). Once you have them use the **closed genomes excluded regions**.
+#### Excluding Mobilome Regions in SNPDV
 
-##### Example bed file
+#####Excluding with a closed reference:
+If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a interval formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use [PHAST] (http://phast.wishartlab.com/) for phage regions prediction and save regions as interval formatted file. Use [ISFinder] (https://www-is.biotoul.fr/) to predict IS elements for your species of interest, this needs to be done only once per species. If your species carries any other mobile genetic elements please add the regions to the interval file (e.g. resistance cassettes). Use the workflow **"Excluded Regions (closed reference)"**.
+
+#####Excluding with a draft genome reference (no reads):
+If you have a draft genome reference without reads you can predict the mobilome with [PHAST] (http://phast.wishartlab.com/), but you will need to save the predicted regions as multifasta, since the PHAST intervals correspond to the concatenated draft genome and not the intervals on each contig. For IS elements you can use  [ISFinder] (https://www-is.biotoul.fr/).If your species carries any other mobile genetic elements please add the regions to the interval file (e.g. resistance cassettes). Since it is a draft genome, any plasmids present will be mixed in with the contigs. If there are known plasmids to be present in all strains  provide a multifasta to exclude them. Use the workflow **"Excluded Regions (draft genome)"**.
+
+#####Excluding with a draft genome reference (reads):
+If you have a draft genome reference with reads you can predict the mobilome with [PHAST] (http://phast.wishartlab.com/), but you will need to save the predicted regions as multifasta, since the PHAST intervals correspond to the concatenated draft genome and not the intervals on each contig. For IS elements you can use  [ISFinder] (https://www-is.biotoul.fr/).If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). In addition you will add the Freebayes output for the reference reads against itself to exclude any base miscalling of the assembly. Since it is a draft genome, any plasmids present will be mixed in with the contigs. If there are known plasmids to be present in all strains  provide a multifasta to exclude them Use the workflow **"Excluded Regions (reads)"**.
+
+
+####### Example interval file
     NC_011353.1	273971	274038
     NC_011353.1	275213	276349
     NC_011353.1	302573	314525
     
-### Reads-based discovery SNPDV (workflows B)
-3 workflows in Galaxy to discover and quality control SNPs based on reads (Illumina). 
- * Install the adapted xml file for Bowtie2
+#### Reads-based discovery SNPDV (workflow B.1.1)
 
-The SNP discovery is reference based and you will need to define the mobilome within the reference genome to avoid SNP miscalling.
-For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads and 
-assembled contigs.
+For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads and assembled contigs. SNPs will be predicted by Bowtie2 mapping & Freebayes. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 
-### B1 Bowtie2 Mapping & Freebayes Discovery
-If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
+#### Contig-based Discovery SNPDV (workflow B.1.2)
+If no reads are available for query genomes, SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
 
+#### SNP validation (workflow B.2)
+You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome), and the predicted SNPs for the species of interest. You will need the assemblies of the query genomes as separate fasta files and concatenated.
+Increase the threads to the total amount of query genomes to speed up the curation.  If you have both reads and draft genomes in your queries you can combine them at this step to get all the SNPs in one single merged table. The output is a filtered table and a multifasta with the curated SNPs for each query genome.
 
-
-
-
-
-If you are working with a draft genome: 
- * Identify IS elements with ISFinder and create a multifasta file
- * Find phage regions with PHAST and create multifasta file
- * Create plasmid multifasta to remove contigs that might match plasmids
- * Provide the fasta file of the reference
- * Take predicted SNPs from Freebayes of reference genome against itself
- 
-If your species does not have some of these mobile elements you can modify the workflow to remove them.
-
-### B3 Verify SNPs
-You will need a fasta and genbank file of the reference, the excluded regions, and the predicted SNPs
-for the species of interest. You will need the assemblies of the query genomes as separate fasta files and concatenated.
-Increase the threads to the total amount of query genomes to speed up the curation. The output is a filtered table and a multifasta with the curated SNPs for each query genome.
-
-### B4 Post-processing (optional)
-The SNPs multifasta is converted to phylip to run on PhyML. The filtered table is processed to provide genotypes and summary
-of SNP characteristics.
-
-## Contig-based SNPDV (wrokflows C)
-You will need a genbank and fasta file for the reference genome and fasta files of the query genomes.
-
-### C1 SNP discovery
-SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
-
-
-### C2 Excluded Regions 
-If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a bed formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use PHAST for phage region prediction and save regions as bed formatted file. Use ISFinder to predict IS elements. If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). Once you have them use the **closed genomes excluded regions workflow**.
-
-#### Example bed file
-    NC_011353.1	273971	274038
-    NC_011353.1	275213	276349
-    NC_011353.1	302573	314525
-
-If you are working with a draft genome: 
- * Identify IS elements with ISFinder and create a multifasta file
- * Find phage regions with PHAST and create multifasta file
- * Create plasmid multifasta to remove contigs that might match plasmids
- * Provide the fasta file of the reference
-If your species does not have some of these mobile elements you can modify the workflow to remove them.
-
-### C3 SNP Curation
-You will need a fasta and genbank file of the reference, the excluded regions, and the predicted SNPs
-for the species of interest. You will need the assemblies of the query genomes as separate fasta files and concatenated.
-If you choose the threaded version you can increase the threads to the total amount of query genomes. The output is a 
-filtered table and a multifasta with the curated SNPs for each query genome.
-  * If you have both reads and draft genomes in our queries you can combine them at this step to get all the SNPs in one single merged table.
- The output is a filtered table and a multifasta with the curated SNPs for each query genome.
 
 #### Example filtered SNP table
     molecule	    refpos	 syn?	 refbase	 qbase:abht	 gene name	          gene start	 gene end	 gene length	 snps per gene	 pos in gene/	
@@ -118,9 +75,12 @@ filtered table and a multifasta with the curated SNPs for each query genome.
 The table not only provides the SNP, but also the corresponding annotation from the reference genome. It provides the length of the
 blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts).
 
-### C4 Post-processing (optional)
+
+### Post-processing (workflow B.3 optional)
 The SNPs multifasta is converted to phylip to run on PhyML. The filtered table is processed to provide genotypes and summary
-of SNP characteristics.
+of SNP characteristics. Please provide the name of the reference genome in the genotyper summary tab.
+
+
 
 
 
