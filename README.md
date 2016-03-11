@@ -1,6 +1,8 @@
-# Galaxy Workflows
+# SNPDV
 
-## System Requirements and Setup
+## Galaxy Setup
+
+### System Requirements
 Linux or Unix based only. Some of the tools used in these workflows were developed by others and do not come in binaries for Windows.
 
 Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, pandas, matplotlib, and biopython. We recommend installing [anaconda python] (https://docs.continuum.io/anaconda/install), which comes with all the packages except biopython that needs to be installed with the command "conda install biopython". 
@@ -9,31 +11,40 @@ Galaxy is an open, web-based platform for accessible, reproducible, and transpar
 To install Galaxy please refer to the [Galaxy Wiki] (https://wiki.galaxyproject.org/FrontPage).
 Galaxy can be run locally, on a server (cluster or single server), and on the cloud. If you are planning on running Galaxy on the cloud, we recommend you select a linux-based operating system.
 
-You can retrieve all the tools and workflows required from the Galaxy toolshed under the repository SNPDV. In addition you will need to retrieve Freebayes and blast+ from the toolshed. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki] (https://wiki.galaxyproject.org/ToolShed).
+You can retrieve all the tools and workflows required from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki] (https://wiki.galaxyproject.org/ToolShed).
 
+## Workflows
 
-
-## Assembly and Annotation (workflows A)
+### Assembly and Annotation (workflows A)
 The first workflow uses SPAdes v.3.7 for *de novo* assembly of reads and PROKKA for annotation. 
   * Please install the modified xml files for SPADes and PROKKA to allow for renaming of files in the batch submission mode. 
   * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
   * If you are assembling longer reads please change the k-mer size in the SPADES option
      * Reads 250 bp or more use k-mer 21,33,55,77,99,127
    * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
+   
   * Make a tab delimited file to import the annotation options for PROKKA.
      * You only need to provide a value of 1 for kingdom if you are annotating viruses.
    * For more information on PROKKA please refer to the [github repository] (https://github.com/tseemann/prokka)
    * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
 
-### Example annotation file  
+##### Example annotation file  
     strain	 locustag	 centre	 genus	      species	plasmid	kingdom
     strainA	 xxx	     centre	 Escherichia	coli		
     strainB	 yyy	     centre  Escherichia	coli	   p90
   
 
+## Excluding Mobilome Regions in SNPDV
 
+###**Excluding with a closed reference:**
+If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a bed formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use PHAST for phage regions prediction and save regions as bed formatted file. Use ISFinder to predict IS elements. If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). Once you have them use the **closed genomes excluded regions**.
 
-## Reads-based SNPDV (workflows B)
+##### Example bed file
+    NC_011353.1	273971	274038
+    NC_011353.1	275213	276349
+    NC_011353.1	302573	314525
+    
+### Reads-based discovery SNPDV (workflows B)
 3 workflows in Galaxy to discover and quality control SNPs based on reads (Illumina). 
  * Install the adapted xml file for Bowtie2
 
@@ -44,14 +55,10 @@ assembled contigs.
 ### B1 Bowtie2 Mapping & Freebayes Discovery
 If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 
-### B2 Excluded Regions 
-If you have a close reference with known mobilome and repeated regions this step can be skipped. Provide a bed formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use PHAST for phage region prediction and save regions as bed formatted file. Use ISFinder to predict IS elements. If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). Once you have them use the **closed genomes excluded regions**.
 
 
-#### Example bed file
-    NC_011353.1	273971	274038
-    NC_011353.1	275213	276349
-    NC_011353.1	302573	314525
+
+
 
 If you are working with a draft genome: 
  * Identify IS elements with ISFinder and create a multifasta file
