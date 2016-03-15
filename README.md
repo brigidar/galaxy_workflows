@@ -62,10 +62,10 @@ If no reads are available for query genomes, SNP discovery is based on NUCmer wi
 
 #### SNP validation (workflow B.2)
 You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome), and the predicted SNPs for the species of interest. You will need the assemblies of the query genomes as separate fasta files and concatenated.
-Increase the threads to the total amount of query genomes to speed up the curation.  If you have both reads and draft genomes in your queries you can combine them at this step to get all the SNPs in one single merged table. The output is a filtered table and a multifasta with the curated SNPs for each query genome.
+Increase the threads to the total amount of query genomes to speed up the curation.  If you have both reads and draft genomes in your queries you can combine them at this step to get all the SNPs in one single merged table. The output is a filtered table and a multifasta with the curated SNPs for each query genome. 
 
 
-#### Example filtered SNP table
+##### Example filtered SNP table
     molecule	    refpos	 syn?	 refbase	 qbase:abht	 gene name	          gene start	 gene end	 gene length	 snps per gene	 pos in gene/	
     NZ CM000662	    101797	 NSYN	 A	         T	         ESCCO14588_RS26480	  101814	     101644	     171	         1	             18//	
     
@@ -76,9 +76,9 @@ The table not only provides the SNP, but also the corresponding annotation from 
 blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts).
 
 
-### Post-processing (workflow B.3 optional)
+#### Post-processing (workflow B.3 optional)
 The SNPs multifasta is converted to phylip to run on PhyML. The filtered table is processed to provide genotypes and summary
-of SNP characteristics. Please provide the name of the reference genome in the genotyper summary tab.
+of SNP characteristics. Please provide the name of the reference genome in the genotyper summary tab. It also provides a png of the SNPS along the genome.
 
 
 
