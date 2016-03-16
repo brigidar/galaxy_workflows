@@ -22,11 +22,14 @@ The first workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads .
   * If you are assembling longer reads please change the k-mer size in the SPADES option
      * Reads 250 bp or more use k-mer 21,33,55,77,99,127
      ![kmer option] (https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
+
   * Scaffolds are filtered accroding to size and coverage
      *Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
      ![coverage option] (https://github.com/brigidar/galaxy_workflows/blob/master/coverage.png)
+
    * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
    * Assembled genomes for queries are required for the validation step of SNPDV.
+   
  **A.2 Annotation**
   * Make a tab delimited file to import the annotation options for PROKKA.
      * Only provide a value of 1 for kingdom column if you are annotating viruses.
