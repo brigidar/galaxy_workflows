@@ -21,7 +21,8 @@ The first workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads .
   * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
   * If you are assembling longer reads please change the k-mer size in the SPADES option
      * Reads 250 bp or more use k-mer 21,33,55,77,99,127
-     ![kmer option] (https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
+ 
+ ![kmer option] (https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
 
   * Scaffolds are filtered accroding to size and coverage
      *Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
@@ -92,7 +93,7 @@ The table not only provides the SNP, but also the corresponding annotation from 
 blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
 
-#### Post-processing (workflow B.3 optional)
+#### Genotyping (workflow B.3 optional)
 The SNPs multifasta is converted to phylip to run on PhyML (GTR, gamma, 1000 bootstraps). If you have included the reference genome in the query genomes during the SNP verify step (last option),  provide the identifier in the drop fasta option.
 ![drop fasta] (https://github.com/brigidar/galaxy_workflows/blob/master/drop_fasta.png)
 
@@ -105,7 +106,8 @@ If you have included the reference genome in the query genomes during the SNP ve
 Provide the name of the reference genome in the genotyper summary tab. 
 ![reference genome name] (https://github.com/brigidar/galaxy_workflows/blob/master/genotyper_select.png)
 
-It also provides a png of the SNPS along the genome.
+To plot SNPs along the genome povide the length of the genome and the bin size for the SNPs. This option is currently only available for closed genomes.
+![snp location] (https://github.com/brigidar/galaxy_workflows/blob/master/figure_1.png)
 
 
 
