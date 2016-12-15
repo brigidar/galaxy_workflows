@@ -8,30 +8,33 @@ Linux or Unix based only. Some of the tools used in these workflows were develop
 Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, pandas, matplotlib, and biopython. We recommend installing [anaconda python] (https://docs.continuum.io/anaconda/install), which comes with all the packages except biopython that needs to be installed with the command "conda install biopython". 
 
 Galaxy is an open, web-based platform for accessible, reproducible, and transparent computational biomedical research. 
-To install Galaxy please refer to the [Galaxy Wiki] (https://wiki.galaxyproject.org/FrontPage).
+Galaxy can be found on [Github] (https://github.com/galaxyproject) and the manual in the [Galaxy Wiki] (https://docs.galaxyproject.org/en/latest/index.html).
 Galaxy can be run locally, on a server (cluster or single server), and on the cloud. If you are planning on running Galaxy on the cloud, we recommend you select a linux-based operating system.
 
-Al tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki] (https://wiki.galaxyproject.org/ToolShed).
+All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki] (https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
 
 ## Workflows
 
 ### Assembly and Annotation (workflows A)
-**A.1 Assembly**
-The first workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads . 
+**A.1 Retrieve SRR reads**
+The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
+
+**A.2 Assembly**
+The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads. 
   * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
   * If you are assembling longer reads please change the k-mer size in the SPADES option
      * Reads 250 bp or more use k-mer 21,33,55,77,99,127
- 
- ![kmer option] (https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
+     ![kmer option] (https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
 
-  * Scaffolds are filtered accroding to size and coverage
-     *Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
+  * Scaffolds are filtered according to size and coverage
+     * Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
      ![coverage option] (https://github.com/brigidar/galaxy_workflows/blob/master/coverage.png)
 
-   * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
-   * Assembled genomes for queries are required for the validation step of SNPDV.
+  * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
+  * An assembled genome is required as a reference for read-based SNP calling.
    
- **A.2 Annotation**
+**A.3 Annotation**
+Annotation provided by PROKKA
   * Make a tab delimited file to import the annotation options for PROKKA.
      * Only provide a value of 1 for kingdom column if you are annotating viruses.
    * For more information on PROKKA please refer to the [github repository] (https://github.com/tseemann/prokka)
