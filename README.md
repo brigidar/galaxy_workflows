@@ -17,9 +17,11 @@ All tools and workflows required can be retrieved from the Galaxy toolshed under
 
 ### Assembly and Annotation (workflows A)
 **A.1 Retrieve SRR reads**
+
 The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
 
 **A.2 Assembly**
+
 The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads. 
   * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
   * If you are assembling longer reads please change the k-mer size in the SPADES option
@@ -34,6 +36,7 @@ The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads.
   * An assembled genome is required as a reference for read-based SNP calling.
    
 **A.3 Annotation**
+
 Annotation provided by PROKKA
   * Make a tab delimited file to import the annotation options for PROKKA.
      * Only provide a value of 1 for kingdom column if you are annotating viruses.
