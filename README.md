@@ -39,10 +39,10 @@ The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads.
 
 Annotation provided by PROKKA
   * Make a tab delimited file to import the annotation options for PROKKA.
-     * Only provide a value of 1 for kingdom column if you are annotating viruses.
-   * For more information on PROKKA please refer to the [github repository] (https://github.com/tseemann/prokka)
-   * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
-   * Annotated genbank file is required for reference sequence only in SNPDV.
+     * Use 1 in kingdom column if you are annotating viruses, otherwise leave blank.
+  * For more information on PROKKA please refer to the [github repository] (https://github.com/tseemann/prokka)
+  * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
+  * Annotated genbank file is required for reference sequence only in SNPDV.
 
 ###### Example annotation file  
     strain	 locustag	 centre	 genus	      species	plasmid	kingdom
@@ -56,7 +56,7 @@ Annotation provided by PROKKA
 
 #####Excluding with a closed reference:
 Use the workflow **"Excluded Regions (closed reference)"**.
-If you have a closed reference with known mobilome and repeated regions this step can be skipped. Provide a interval formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use [PHAST] (http://phast.wishartlab.com/) for phage regions prediction and save regions as an interval formatted file. Use [ISFinder] (https://www-is.biotoul.fr/) to predict IS elements for your species of interest. This needs to be done only once per species. If your species carries any other mobile genetic elements within the chromosome please add the regions to the interval file (e.g. resistance cassettes). 
+If you have a closed reference with known mobilome and repeated regions this step can be skipped. Provide a interval formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use [PHASTER] (http://phaster.ca/) for phage regions prediction and save regions as an interval formatted file. Use [ISFinder] (https://www-is.biotoul.fr/) to predict IS elements for your species of interest. This needs to be done only once per species. If your species carries any other mobile genetic elements within the chromosome please add the regions to the interval file (e.g. resistance cassettes). 
 
 #####Excluding with a draft genome reference (no reads):
 Use the workflow **"Excluded Regions (draft genome)"**.
@@ -74,18 +74,25 @@ If you have a draft genome reference with reads you can predict the mobilome wit
     
 #### Reads-based Discovery (workflow B.1.1)
 
-For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads (fastq). SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
+For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads (fastqsanger). The reads should be provided as a paired list if not downloaded from SRR. SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 ![coverage] (https://github.com/brigidar/galaxy_workflows/blob/master/coverage_fb.png)
 
-#### Contig-based Discovery (workflow B.1.2)
+#### Count predicted SNPs (optional)
+This script can help to predict an outlier before validation. It will count the amount of variants predicted for each genome in the output list of workflow B.1.1. Outlier genomes can be removed from the analysis before proceeding to validation. Keeping outlier genomes can cause the loss of valid SNP locations due to lack of matching sequences (no hits).
+
+#### SNP Validation reads (workflow B.1.2)
+A reference genome (fasta & genbank) is required as well as the excluded regions and predicted SNP list. SNPs are compared to excluded regions for filtering. Remaining SNPs are combined into a single table and no hits and positions with ambigous nucleotides are removed (optional). The output is a filtered table and a multifasta with the curated SNPs for each query genome.
+
+#### Contig-based Discovery (workflow B.2.1)
 If no reads are available for query genomes, SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
 
-#### SNP Validation (workflow B.2)
-You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome format), and the predicted SNPs for the query genomes. You will need the assemblies of the query genomes as separate fasta files and concatenated. The fasta files can be concatenated in Galaxy with the concatenate fasta tool.If you have both read and contig-based SNP discovery outputs you can combine them at this step to get all the SNPs in one single merged table.
-The verification step can be threaded if your computational settings allow it. It will thread according to the number of SNPs (nb of threads = 30% of predicted SNPs or max amount of threads). To change to a threaded version open the workflow and modify the SNP verify block by selecting threaded.  
+#### SNP Validation contigs (workflow B.2.2)
+You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome format), and the predicted SNPs for the query genomes. You will need the assemblies of the query genomes as separate fasta files and multifasta. The multifasta file can be generated in Galaxy with the concatenate fasta tool. If you have both read and contig-based SNP discovery outputs you can combine them at this step to get all the SNPs in one single merged table.
+If your computational settings allow it the verification step can be threaded. Number of threads will dependon on number of SNPs (nb of threads = 30% of predicted SNPs or max amount of available threads). To change to a threaded version open the workflow and modify the SNP verify block by selecting threaded.  
 ![change to threaded] (https://github.com/brigidar/galaxy_workflows/blob/master/threaded.png)
 
 The output is a filtered table and a multifasta with the curated SNPs for each query genome. 
+
 
 
 ##### Example filtered SNP table
@@ -95,8 +102,7 @@ The output is a filtered table and a multifasta with the curated SNPs for each q
     //ref codon  ref aa      query codon	query aa	 transition/transversion	//		maxlen:abht	 blengths:abht	 product
       TTA        L           TTT	        F	         transversion	           // 	    40	         40	             hypothetical
 
-The table not only provides the SNP, but also the corresponding annotation from the reference genome. It provides the length of the
-blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
+The table not only provides the SNP, but also the corresponding annotation from the reference genome. For contig based discovery it provides the length of the blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
 
 #### Genotyping (workflow B.3 optional)
