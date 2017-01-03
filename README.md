@@ -1,17 +1,29 @@
 # SNPDV
 
+## General Considerations before starting
+
+This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded (see exclusion criteria).
+
+## Files required
+ * Reference Genome (fasta and annotated genbank, see A workflows to generate a reference from in-house sequencing or SRA files)
+ * IS elements of reference genome (see exclusion criteria)
+ * Plasmids database of species of interest (only required if reference is a draft genome or assembled from in-house sequencing)
+ * Reads or assemblies from genomes of interest
+
 ## Galaxy Setup
 
 ### System Requirements
 Linux or Unix based only. Some of the tools used in these workflows were developed by others and do not come in binaries for Windows.
 
-Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, pandas, matplotlib, and biopython. We recommend installing [anaconda python] (https://docs.continuum.io/anaconda/install), which comes with all the packages except biopython that needs to be installed with the command "conda install biopython". 
+Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, Pandas, Matplotlib, and Biopython. We recommend installing [anaconda python] (https://docs.continuum.io/anaconda/install), which comes with all the packages except biopython that needs to be installed with the command "conda install biopython". 
 
 Galaxy is an open, web-based platform for accessible, reproducible, and transparent computational biomedical research. 
 Galaxy can be found on [Github] (https://github.com/galaxyproject) and the manual in the [Galaxy Wiki] (https://docs.galaxyproject.org/en/latest/index.html).
 Galaxy can be run locally, on a server (cluster or single server), and on the cloud. If you are planning on running Galaxy on the cloud, we recommend you select a linux-based operating system.
 
 All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki] (https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
+
+Once installed you can upload your files through the browser or retrieve reads from NCBI with 
 
 ## Workflows
 
@@ -50,7 +62,7 @@ Annotation provided by PROKKA
     strainB	 yyy	     centre  Escherichia	coli	   p90
   
 
-### SNPDV (workflows B)
+### Excluding regions (workflows B)
 
 #### Excluding Mobilome Regions in SNPDV
 
@@ -71,8 +83,9 @@ If you have a draft genome reference with reads you can predict the mobilome wit
     NC_011353.1	275213	276349
     NC_011353.1	302573	314525
     
-    
-#### Reads-based Discovery (workflow B.1.1)
+### SNPDV (workflows C)
+
+#### Reads-based Discovery (workflow C.1.1)
 
 For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads (fastqsanger). The reads should be provided as a paired list if not downloaded from SRR. SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 ![coverage] (https://github.com/brigidar/galaxy_workflows/blob/master/coverage_fb.png)
@@ -80,13 +93,13 @@ For the selected reference you will need a fasta and an annotated genbank file. 
 #### Count predicted SNPs (optional)
 This script can help to predict an outlier before validation. It will count the amount of variants predicted for each genome in the output list of workflow B.1.1. Outlier genomes can be removed from the analysis before proceeding to validation. Keeping outlier genomes can cause the loss of valid SNP locations due to lack of matching sequences (no hits).
 
-#### SNP Validation reads (workflow B.1.2)
+#### SNP Validation reads (workflow C.1.2)
 A reference genome (fasta & genbank) is required as well as the excluded regions and predicted SNP list. SNPs are compared to excluded regions for filtering. Remaining SNPs are combined into a single table and no hits and positions with ambigous nucleotides are removed (optional). The output is a filtered table and a multifasta with the curated SNPs for each query genome.
 
-#### Contig-based Discovery (workflow B.2.1)
+#### Contig-based Discovery (workflow C.2.1)
 If no reads are available for query genomes, SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
 
-#### SNP Validation contigs (workflow B.2.2)
+#### SNP Validation contigs (workflow C.2.2)
 You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome format), and the predicted SNPs for the query genomes. You will need the assemblies of the query genomes as separate fasta files and multifasta. The multifasta file can be generated in Galaxy with the concatenate fasta tool. If you have both read and contig-based SNP discovery outputs you can combine them at this step to get all the SNPs in one single merged table.
 If your computational settings allow it the verification step can be threaded. Number of threads will dependon on number of SNPs (nb of threads = 30% of predicted SNPs or max amount of available threads). To change to a threaded version open the workflow and modify the SNP verify block by selecting threaded.  
 ![change to threaded] (https://github.com/brigidar/galaxy_workflows/blob/master/threaded.png)
@@ -105,7 +118,7 @@ The output is a filtered table and a multifasta with the curated SNPs for each q
 The table not only provides the SNP, but also the corresponding annotation from the reference genome. For contig based discovery it provides the length of the blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
 
-#### Genotyping (workflow B.3 optional)
+#### Genotyping (workflow C.3 optional)
 The SNPs multifasta is converted to phylip to run on PhyML (GTR, gamma, 1000 bootstraps). If you have included the reference genome in the query genomes during the SNP verify step (last option),  provide the identifier in the drop fasta option.
 ![drop fasta] (https://github.com/brigidar/galaxy_workflows/blob/master/drop_fasta.png)
 
