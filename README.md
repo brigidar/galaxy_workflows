@@ -30,16 +30,14 @@ Once installed you can upload your files through the browser or retrieve reads f
 
 #### Excluding Mobilome Regions
 
-#####Excluding with a closed reference:
+##### Excluding with a closed reference:
 Use the workflow **"Excluded Regions Closed"**.
 If you have a closed reference with known mobilome and repeated regions this step can be skipped. Provide a interval formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use [PHASTER](http://phaster.ca/) for phage regions prediction and save regions as an interval formatted file. Use [ISFinder](https://www-is.biotoul.fr/) to predict IS elements for your species of interest. This needs to be done only once per species. If your species carries any other mobile genetic elements within the chromosome please add the regions to the interval file (e.g. resistance cassettes). 
 
-#####Excluding with a draft genome:
+##### Excluding with a draft genome:
 Use the workflow **"Excluded Regions Draft"**.
 If you have a draft genome reference without reads you can predict the mobilome with [PHAST](http://phast.wishartlab.com/), but you will need to save the predicted regions as multifasta, since the PHAST intervals correspond to the concatenated draft genome and not the intervals on each contig. For IS elements you can use  [ISFinder](https://www-is.biotoul.fr/). If your species carries any other mobile genetic elements please add the regions to the interval file (e.g. resistance cassettes). Since it is a draft genome, any plasmids present will be mixed in with the chromosomal contigs, therefore provide a multifasta to exclude them. 
-
-
-####### Example interval file
+###### Example interval file
     NC_011353.1	|273971	|274038
     NC_011353.1	|275213	|276349
     NC_011353.1	|302573	|314525
