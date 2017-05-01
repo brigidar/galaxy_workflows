@@ -1,13 +1,12 @@
 # SNPDV
 
-## General Considerations before starting
+## General Considerations
 
-This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded (see exclusion criteria).
+This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](### Exclusion Criteria).
 
 ## Files required
-  * Reference Genome (fasta and annotated genbank, see A workflows to generate a reference from in-house sequencing or SRA files)
-  * IS elements of reference genome (see exclusion criteria)
-  * Plasmids database of species of interest (only required if reference is a draft genome or assembled from in-house sequencing)
+  * Reference Genome (fasta and annotated genbank, see [Annotation and Assembly](### Assembly and Annotation) workflow to generate a reference from in-house sequencing or SRA files)
+  * IS elements, phages, plasmids of reference genome [exclusion criteria](### Exclusion Criteria)
   * Reads or assemblies from genomes of interest
 
 ## Galaxy Setup
@@ -27,56 +26,18 @@ Once installed you can upload your files through the browser or retrieve reads f
 
 ## Workflows
 
-### Assembly and Annotation (workflows A)
-**A.1 Retrieve SRR reads**
+### Exclusion Criteria
 
-The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
-
-**A.2 Assembly**
-
-The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads. 
-  * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
-  * If you are assembling longer reads please change the k-mer size in the SPADES option
-     * Reads 250 bp or more use k-mer 21,33,55,77,99,127
-     ![kmer option](https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
-
-  * Scaffolds are filtered according to size and coverage
-     * Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
-     ![coverage option](https://github.com/brigidar/galaxy_workflows/blob/master/coverage.png)
-
-  * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
-  * An assembled genome is required as a reference for read-based SNP calling.
-   
-**A.3 Annotation**
-
-Annotation provided by PROKKA
-  * Make a tab delimited file to import the annotation options for PROKKA.
-     * Use 1 in kingdom column if you are annotating viruses, otherwise leave blank.
-  * For more information on PROKKA please refer to the [github repository](https://github.com/tseemann/prokka)
-  * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
-  * Annotated genbank file is required for reference sequence only in SNPDV.
-
-###### Example annotation file  
-    strain	 locustag	 centre	 genus	      species	plasmid	kingdom
-    strainA	 xxx	     centre	 Escherichia	coli		
-    strainB	 yyy	     centre  Escherichia	coli	   p90
-  
-
-### Excluding regions (workflows B)
-
-#### Excluding Mobilome Regions in SNPDV
+#### Excluding Mobilome Regions
 
 #####Excluding with a closed reference:
-Use the workflow **"Excluded Regions (closed reference)"**.
+Use the workflow **"Excluded Regions Closed"**.
 If you have a closed reference with known mobilome and repeated regions this step can be skipped. Provide a interval formatted file with the coordinates of the regions to exclude. If you don't know the mobilome use [PHASTER](http://phaster.ca/) for phage regions prediction and save regions as an interval formatted file. Use [ISFinder](https://www-is.biotoul.fr/) to predict IS elements for your species of interest. This needs to be done only once per species. If your species carries any other mobile genetic elements within the chromosome please add the regions to the interval file (e.g. resistance cassettes). 
 
-#####Excluding with a draft genome reference (no reads):
-Use the workflow **"Excluded Regions (draft genome)"**.
+#####Excluding with a draft genome:
+Use the workflow **"Excluded Regions Draft"**.
 If you have a draft genome reference without reads you can predict the mobilome with [PHAST](http://phast.wishartlab.com/), but you will need to save the predicted regions as multifasta, since the PHAST intervals correspond to the concatenated draft genome and not the intervals on each contig. For IS elements you can use  [ISFinder](https://www-is.biotoul.fr/). If your species carries any other mobile genetic elements please add the regions to the interval file (e.g. resistance cassettes). Since it is a draft genome, any plasmids present will be mixed in with the chromosomal contigs, therefore provide a multifasta to exclude them. 
 
-#####Excluding with a draft genome reference (reads):
-Use the workflow **"Excluded Regions (reads)"**.
-If you have a draft genome reference with reads you can predict the mobilome with [PHAST](http://phast.wishartlab.com/), but you will need to save the predicted regions as multifasta, since the PHAST intervals correspond to the concatenated draft genome and not the intervals on each contig. For IS elements you can use [ISFinder](https://www-is.biotoul.fr/). If your species carries any other mobile genetic elements please add the regions to the bed file (e.g. resistance cassettes). In addition you will add the Freebayes output for the reference reads against itself to exclude any base miscalling of the assembly. Since it is a draft genome, any plasmids present will be mixed in with the contigs. therefore provide a multifasta to exclude them. 
 
 ####### Example interval file
     NC_011353.1	273971	274038
@@ -117,6 +78,45 @@ The output is a filtered table and a multifasta with the curated SNPs for each q
 
 The table not only provides the SNP, but also the corresponding annotation from the reference genome. For contig based discovery it provides the length of the blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
+### Assembly and Annotation 
+**A.1 Retrieve SRR reads**
+
+The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
+
+**A.2 Assembly**
+
+The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads. 
+  * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
+  * If you are assembling longer reads please change the k-mer size in the SPADES option
+     * Reads 250 bp or more use k-mer 21,33,55,77,99,127
+     ![kmer option](https://github.com/brigidar/galaxy_workflows/blob/master/kmer.png)
+
+  * Scaffolds are filtered according to size and coverage
+     * Coverage or length settings should be changed according to sequencing technology (MiSeq, NextSeq, HiSeq)  
+     ![coverage option](https://github.com/brigidar/galaxy_workflows/blob/master/coverage.png)
+
+  * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
+  * An assembled genome is required as a reference for read-based SNP calling.
+   
+**A.3 Annotation**
+
+Annotation provided by PROKKA
+  * Make a tab delimited file to import the annotation options for PROKKA.
+     * Use 1 in kingdom column if you are annotating viruses, otherwise leave blank.
+  * For more information on PROKKA please refer to the [github repository](https://github.com/tseemann/prokka)
+  * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
+  * Annotated genbank file is required for reference sequence only in SNPDV.
+
+###### Example annotation file  
+    strain	 locustag	 centre	 genus	      species	plasmid	kingdom
+    strainA	 xxx	     centre	 Escherichia	coli		
+    strainB	 yyy	     centre  Escherichia	coli	   p90
+  
+
+
+    
+
+
 
 #### Genotyping (workflow C.3 optional)
 The SNPs multifasta is converted to phylip to run on PhyML (GTR, gamma, 1000 bootstraps). If you have included the reference genome in the query genomes during the SNP verify step (last option),  provide the identifier in the drop fasta option.
@@ -133,6 +133,7 @@ Provide the name of the reference genome in the genotyper summary tab.
 
 To plot SNPs along the genome povide the length of the genome and the bin size for the SNPs. This option is currently only available for closed genomes.
 ![snp location](https://github.com/brigidar/galaxy_workflows/blob/master/figure_1.png)
+
 
 
 
