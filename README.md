@@ -2,11 +2,11 @@
 
 ## General Considerations
 
-This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](### Exclusion Criteria).
+This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](# exclusion criteria).
 
 ## Files required
-  * Reference Genome (fasta and annotated genbank, see [Assembly and Annotation](### Assembly and Annotation) workflow to generate a reference from in-house sequencing or SRA files)
-  * IS elements, phages, plasmids of reference genome [exclusion criteria](### Exclusion Criteria)
+  * Reference Genome (fasta and annotated genbank, see [Assembly and Annotation](# Assembly and Annotation) workflow to generate a reference from in-house sequencing or SRA files)
+  * IS elements, phages, plasmids of reference genome [exclusion criteria](# exclusion criteria)
   * Reads or assemblies from genomes of interest
 
 ## Galaxy Setup
