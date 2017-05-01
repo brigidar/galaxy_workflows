@@ -5,7 +5,7 @@
 This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](### Exclusion Criteria).
 
 ## Files required
-  * Reference Genome (fasta and annotated genbank, see [Annotation and Assembly](### Assembly and Annotation) workflow to generate a reference from in-house sequencing or SRA files)
+  * Reference Genome (fasta and annotated genbank, see [Assembly and Annotation](### Assembly and Annotation) workflow to generate a reference from in-house sequencing or SRA files)
   * IS elements, phages, plasmids of reference genome [exclusion criteria](### Exclusion Criteria)
   * Reads or assemblies from genomes of interest
 
@@ -26,7 +26,7 @@ Once installed you can upload your files through the browser or retrieve reads f
 
 ## Workflows
 
-### Exclusion Criteria
+### Exclusion Criteria <a name="exclusion criteria"></a>
 
 #### Excluding Mobilome Regions
 
@@ -78,7 +78,7 @@ The output is a filtered table and a multifasta with the curated SNPs for each q
 
 The table not only provides the SNP, but also the corresponding annotation from the reference genome. For contig based discovery it provides the length of the blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
-### Assembly and Annotation 
+### Assembly and Annotation <a name="Assembly and Annotation"></a>
 **A.1 Retrieve SRR reads**
 
 The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
