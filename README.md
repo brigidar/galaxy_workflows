@@ -40,13 +40,13 @@ If you have a draft genome reference without reads you can predict the mobilome 
 
 
 ####### Example interval file
-    NC_011353.1	273971	274038
-    NC_011353.1	275213	276349
-    NC_011353.1	302573	314525
+    NC_011353.1	|273971	|274038
+    NC_011353.1	|275213	|276349
+    NC_011353.1	|302573	|314525
     
-### SNPDV (workflows C)
+### SNPDV Reads
 
-#### Reads-based Discovery (workflow C.1.1)
+#### Reads-based Discovery 
 
 For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads (fastqsanger). The reads should be provided as a paired list if not downloaded from SRR. SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
 ![coverage](https://github.com/brigidar/galaxy_workflows/blob/master/coverage_fb.png)
@@ -54,9 +54,10 @@ For the selected reference you will need a fasta and an annotated genbank file. 
 #### Count predicted SNPs (optional)
 This script can help to predict an outlier before validation. It will count the amount of variants predicted for each genome in the output list of workflow B.1.1. Outlier genomes can be removed from the analysis before proceeding to validation. Keeping outlier genomes can cause the loss of valid SNP locations due to lack of matching sequences (no hits).
 
-#### SNP Validation reads (workflow C.1.2)
+#### SNP Validation reads
 A reference genome (fasta & genbank) is required as well as the excluded regions and predicted SNP list. SNPs are compared to excluded regions for filtering. Remaining SNPs are combined into a single table and no hits and positions with ambigous nucleotides are removed (optional). The output is a filtered table and a multifasta with the curated SNPs for each query genome.
 
+### SNPDV Assembly
 #### Contig-based Discovery (workflow C.2.1)
 If no reads are available for query genomes, SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
 
