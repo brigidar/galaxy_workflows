@@ -14,7 +14,7 @@ This pipeline is thought for outbreak inclusion and exclusion analyses based on 
 ### System Requirements
 Linux or Unix based only. Some of the tools used in these workflows were developed by others and do not come in binaries for Windows.
 
-Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, Pandas, Matplotlib, and Biopython. We recommend installing [anaconda python](https://docs.continuum.io/anaconda/install), which comes with all the packages except biopython that needs to be installed with the command "conda install biopython". 
+Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, Pandas, Matplotlib, and Biopython. We recommend installing [anaconda python](https://docs.continuum.io/anaconda/install), which comes with many packages. You will need to manually install by using "conda install xx" (xx is the package of interest) in command line the following packages biopython, pandas, mummer.
 
 Galaxy is an open, web-based platform for accessible, reproducible, and transparent computational biomedical research. 
 Galaxy can be found on [Github](https://github.com/galaxyproject) and the manual in the [Galaxy Wiki](https://docs.galaxyproject.org/en/latest/index.html).
@@ -23,6 +23,7 @@ Galaxy can be run locally, on a server (cluster or single server), and on the cl
 All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki](https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
 
 Once installed you can upload your files through the browser or retrieve reads from NCBI based on Bioproject number with the tool "Bioproject Fastq Dump paired" into a paired read list and reference genomes with "Retrieve genome NCBI".
+
 
 ## Workflows
 
