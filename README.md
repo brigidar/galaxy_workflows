@@ -14,7 +14,7 @@ This pipeline is thought for outbreak inclusion and exclusion analyses based on 
 ### System Requirements
 Linux or Unix based only. Some of the tools used in these workflows were developed by others and do not come in binaries for Windows.
 
-Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, Pandas, Matplotlib, and Biopython. We recommend installing [anaconda python](https://docs.continuum.io/anaconda/install), which comes with many packages. You will need to manually install by using "conda install xx" (xx is the package of interest) in command line the following packages biopython, pandas, mummer.
+Before installing Galaxy please check your python version (2.7 or higher). You will also need the following packages: Numpy, Pandas, Matplotlib, and Biopython. We recommend installing [anaconda python](https://docs.continuum.io/anaconda/install), which comes with many packages. 
 
 Galaxy is an open, web-based platform for accessible, reproducible, and transparent computational biomedical research. 
 Galaxy can be found on [Github](https://github.com/galaxyproject) and the manual in the [Galaxy Wiki](https://docs.galaxyproject.org/en/latest/index.html).
@@ -22,10 +22,20 @@ Galaxy can be run locally, on a server (cluster or single server), and on the cl
 
 All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki](https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
 
-Once installed you can upload your files through the browser or retrieve reads from NCBI based on Bioproject number with the tool "Bioproject Fastq Dump paired" into a paired read list and reference genomes with "Retrieve genome NCBI".
+### Install packages
 
+Although Galaxy allows to call up conda packages through the requirements tag in the xml, installing them before will make it less clunky and assure that they are functional. In command line type "conda install" followed by the name of the package as given in the list. Please install all the packages below. Conda will automatically add the path to the bin and you will be able to use the programs in Galaxy.
+  * biopython
+  * bedtools
+  * pandas
+  * entrez-direct
+  * sra-tools
+  * matplotlib
+  * samtools
 
 ## Workflows
+
+Once installed you can upload your files through the browser or retrieve reads from NCBI based on Bioproject number with the tool "Bioproject Fastq Dump paired" into a paired read list and reference genomes with "Retrieve genome NCBI".
 
 ### Exclusion Criteria <a name="exclusion"></a>
 
