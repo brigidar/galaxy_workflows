@@ -1,11 +1,11 @@
-# SNPDV
+# SNPDEF
 
 ## General Considerations
 
-This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages and insertion elements, of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](#exclusion).
+This pipeline is thought for outbreak inclusion and exclusion analyses based on single nucleotide polymorphism, as well as phylogenetic inference of closely related bacterial species or serotypes. For more distantly related bacteria the amount of homoplastic events will preclude an accurate reconstruction of the evolutionary relationship of the species of interest and other methods should be considered. We also recommend to have some prior knowledge of possible mobile genetic elements, such as resistance cassettes, phages, and insertion elements of the species of interest, as they will interfere with the SNP analysis if not correctly excluded [exclusion criteria](#exclusion).
 
 ## Files required
-  * Reference Genome (fasta and annotated genbank, see [Assembly and Annotation](#Assembly) workflow to generate a reference from in-house sequencing or SRA files)
+  * Reference Genome (fasta and annotated genbank, see [Assembly and Annotation](#Assembly) workflow 1 to generate a reference from in-house sequencing or SRA files)
   * IS elements, phages, plasmids of reference genome [exclusion criteria](#exclusion)
   * Reads or assemblies from genomes of interest
 
@@ -20,18 +20,9 @@ Galaxy is an open, web-based platform for accessible, reproducible, and transpar
 Galaxy can be found on [Github](https://github.com/galaxyproject) and the manual in the [Galaxy Wiki](https://docs.galaxyproject.org/en/latest/index.html).
 Galaxy can be run locally, on a server (cluster or single server), and on the cloud. If you are planning on running Galaxy on the cloud, we recommend you select a linux-based operating system.
 
-All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDV. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki](https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
+All tools and workflows required can be retrieved from the Galaxy toolshed under the repository SNPDEF. This can be done from the browser interface directly. For more information on how to install tools, please refer to the [Galaxy Toolshed Wiki](https://docs.galaxyproject.org/en/latest/ts_api_doc.html).
 
-### Install packages
 
-Although Galaxy allows to call up conda packages through the requirements tag in the xml, installing them before will make it less clunky and assure that they are functional. In command line type "conda install" followed by the name of the package as given in the list. Please install all the packages below. Conda will automatically add the path to the bin and you will be able to use the programs in Galaxy.
-  * biopython
-  * bedtools
-  * pandas
-  * entrez-direct
-  * sra-tools
-  * matplotlib
-  * samtools
 
 ## Workflows
 
@@ -41,14 +32,12 @@ Once installed you can upload your files through the browser or retrieve reads f
 
 #### Excluding Mobilome Regions
 
-This needs to be done only once per species.
-
 ##### Excluding with a closed reference:
-Use the workflow **"Excluded Regions Closed"**.
+Use the workflow **"workflow 2a"**.
 If you have a closed reference with known mobilome and repeated regions in an interval file this step can be skipped. If you don't know the mobilome use [PHASTER](http://phaster.ca/) for phage regions prediction and save regions as an interval formatted file. Use [ISFinder](https://www-is.biotoul.fr/) to predict IS elements for your species of interest. If your species carries other mobile genetic elements within the chromosome please add them to the interval file (e.g. resistance cassettes). 
 
 ##### Excluding with a draft genome:
-Use the workflow **"Excluded Regions Draft"**.
+Use the workflow **"workflow 2b"**.
 For draft genomes mobile genetic elements need to be predicted like for closed references with [PHAST](http://phast.wishartlab.com/). However the predicted regions should be saved as multifasta, since intervals provided by PHAST correspond to concatenated contigs and not the actual intervals on each contig. For IS elements you can use  [ISFinder](https://www-is.biotoul.fr/). If your species carries any other mobile genetic elements please add the regions to the interval file (e.g. resistance cassettes). Draft genomes can have plasmid contigs in the assembly, therefore provide a multifasta of plasmids commonly found in the species of interest to exclude them. 
 
 ###### Example interval file
@@ -56,29 +45,27 @@ For draft genomes mobile genetic elements need to be predicted like for closed r
     NC_011353.1	275213	276349
     NC_011353.1	302573	314525
     
-### SNPDV Reads
+### SNPDV Reads (workflow 3)
+You will need a fasta and genbank file of the reference genome, fastq files for each query genome, and an exclusion dataset generated with workflows 2a or 2b.
 
 #### Reads-based Discovery 
-
-For the selected reference you will need a fasta and an annotated genbank file. For the query genomes you will need reads (fastqsanger). The reads should be provided as a paired list if not downloaded from SRR. SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads lower the coverage to 10 in the Freebayes options.
+The reads should be provided as a paired list (autmatically generated by fastq_dump_Bioproject_paired). SNPs will be predicted by Bowtie2 mapping & Freebayes variant calling. If you are using MiSeq reads you might have to lower the coverage to 10 in the Freebayes options.
 ![coverage](https://github.com/brigidar/galaxy_workflows/blob/master/coverage_fb.png)
 
-#### Count predicted SNPs (optional)
-This script can help to predict an outlier before validation. It will count the amount of variants predicted for each genome in the output list of workflow B.1.1. Outlier genomes can be removed from the analysis before proceeding to validation. Keeping outlier genomes can cause the loss of valid SNP locations due to lack of matching sequences (no hits).
+#### SNP filtering and annotating
+SNPs are compared to excluded regions for filtering. Remaining SNPs are combined into a single table and no hits and positions with ambigous nucleotides are removed (optional). The output is a filtered table and a multifasta with the curated SNPs for each query genome.
 
-#### SNP Validation reads
-A reference genome (fasta & genbank) is required as well as the excluded regions and predicted SNP list. SNPs are compared to excluded regions for filtering. Remaining SNPs are combined into a single table and no hits and positions with ambigous nucleotides are removed (optional). The output is a filtered table and a multifasta with the curated SNPs for each query genome.
+### SNPDV Assembly (workflow 4)
+You will need a fasta and genbank file of the reference genome, fasta files for each query genome, and an exclusion dataset generated with workflows 2a or 2b.
 
-### SNPDV Assembly
-#### Contig-based Discovery (workflow C.2.1)
-If no reads are available for query genomes, SNP discovery is based on NUCmer with delta-filter and show-snps. Provide a list of query genomes (fasta files) to predict SNPs against reference genome (fasta file).
+#### Contig-based Discovery 
+SNP discovery is based on NUCmer with delta-filter and show-snps.
 
-#### SNP Validation contigs (workflow C.2.2)
-You will need a fasta and genbank file of the reference, the excluded regions (prepared according to reference genome format), and the predicted SNPs for the query genomes. You will need the assemblies of the query genomes as separate fasta files and multifasta. The multifasta file can be generated in Galaxy with the concatenate fasta tool. If you have both read and contig-based SNP discovery outputs you can combine them at this step to get all the SNPs in one single merged table.
-If your computational settings allow it the verification step can be threaded. Number of threads will dependon on number of SNPs (nb of threads = 30% of predicted SNPs or max amount of available threads). To change to a threaded version open the workflow and modify the SNP verify block by selecting threaded.  
+#### SNP Exclusion and Filtering contigs  
+The workflow is by default threaded. Number of threads will dependon on number of SNPs (nb of threads = 30% of predicted SNPs or max amount of available threads). To change to a non-threaded version open the workflow and modify the SNP verify block.  
 ![change to threaded](https://github.com/brigidar/galaxy_workflows/blob/master/threaded.png)
 
-The output is a filtered table and a multifasta with the curated SNPs for each query genome. 
+The output is a filtered table and a multifasta with the curated SNPs for each query genome, as well as a count of SNPs per genome. 
 
 
 
@@ -91,12 +78,10 @@ The output is a filtered table and a multifasta with the curated SNPs for each q
 
 The table not only provides the SNP, but also the corresponding annotation from the reference genome. For contig based discovery it provides the length of the blastn hit(maxlen), as well if there are additional hits of lower quality (blenghts). Positions with multiple high quality blastn hits are excluded, as well as indels, no hits, and invariant sites.
 
-### Assembly and Annotation <a name="Assembly"></a>
-**A.1 Retrieve SRR reads**
+### Assembly and Annotation (workflow 1) <a name="Assembly"></a>
 
-The workflow fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
 
-**A.2 Assembly**
+**Assembly**
 
 The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads. 
   * Reads should be imported as fastqsanger format and grouped into a paired dataset list.
@@ -109,46 +94,40 @@ The workflow uses SPAdes v.3.7.1 for *de novo* assembly of reads.
      ![coverage option](https://github.com/brigidar/galaxy_workflows/blob/master/coverage.png)
 
   * For more information on SPAdes please refer to the [manual] (http://spades.bioinf.spbau.ru/release3.7.0/manual.html)
-  * An assembled genome is required as a reference for read-based SNP calling.
+  * An assembled genome is required as a reference for SNP calling.
    
 **A.3 Annotation**
 
 Annotation provided by PROKKA
-  * Make a tab delimited file to import the annotation options for PROKKA.
-     * Use 1 in kingdom column if you are annotating viruses, otherwise leave blank.
   * For more information on PROKKA please refer to the [github repository](https://github.com/tseemann/prokka)
-  * We recommend building a genus database of curated annotations to install in your Galaxy instance. This will improve the annotation by preferentially using the genus database during annotation.
-  * Annotated genbank file is required for reference sequence only in SNPDV.
+  * An annotated genbank file is required for the reference sequence only.
 
-###### Example annotation file  
-    strain	 locustag	 centre	 genus	      species	plasmid	kingdom
-    strainA	 xxx	     centre	 Escherichia	coli		
-    strainB	 yyy	     centre  Escherichia	coli	   p90
   
-
+#### Phylogeny (workflow 5 optional)
+SNP fasta file is required to generate a maximum likelihood phylogeny with RAxML. The ASC_GAMMA nucleotide model with 0 invariable sites and ASC correction style stamatakis is used. 
 
     
+#### Rerooting (workflow 5 optional)
+This workflow will allow you to reroot the SNP tree for better visualization on your leafs of interest.
 
 
-
-#### Genotyping (workflow C.3 optional)
-The SNPs multifasta is converted to phylip to run on PhyML (GTR, gamma, 1000 bootstraps). If you have included the reference genome in the query genomes during the SNP verify step (last option),  provide the identifier in the drop fasta option.
-![drop fasta](https://github.com/brigidar/galaxy_workflows/blob/master/drop_fasta.png)
+#### Genotyping (workflow 7 optional)
 
 The filtered table is processed to provide genotypes and summary of SNP characteristics.
 ![summary genotypes](https://github.com/brigidar/galaxy_workflows/blob/master/genotyper.png)
 
-If you have included the reference genome in the query genomes during the SNP verify step (last option), provide the column numbers to the left and right of the column to be removed before genotyping. 
-![drop column](https://github.com/brigidar/galaxy_workflows/blob/master/drop_column.png)
-
 Provide the name of the reference genome in the genotyper summary tab. 
 ![reference genome name](https://github.com/brigidar/galaxy_workflows/blob/master/genotyper_select.png)
 
+
+### Other scripts available
+**Plotting of SNPs**
 To plot SNPs along the genome povide the length of the genome and the bin size for the SNPs. This option is currently only available for closed genomes.
 ![snp location](https://github.com/brigidar/galaxy_workflows/blob/master/figure_1.png)
 
+**Retrieve SRR reads**
+This tool fetches SRR reads based on Bioproject number (NCBI) and saves it as a paired list.
 
-
-
-
+**Retrieve genomes**
+This tool gets genbank and fasta file for genome based on NCBI ID.
 
