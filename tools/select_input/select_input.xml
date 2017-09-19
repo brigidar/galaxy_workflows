@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<tool id="select_input" name="select_input" version="0.1">
+    <description> select if there will be an input list or not</description>
+    <command>
+        mkdir outputs;
+        #if str($option_type..options_type_selector) =='True':
+        #for $input in $reference_source.input1:
+            mv $input ./outputs/$input.fq
+        #end for
+        #else:
+            mv $__tool_directory__/empty1.fq ./outputs ;
+            mv $__tool_directory__/empty2.fq ./outputs ;
+        #end if
+    </command>
+
+    </configfiles>
+<inputs>
+    <conditional name="reference_source">
+        <param name="reference_reads" type="select" label="Reference reads">
+            <option value="True" selected="True">Reference reads available</option>
+            <option value="False">No reference reads</option>
+        </param>
+        <when value="True">
+        <param name="input1" type="data_collection"  collection_type="paired"/>
+        </when>
+    </conditional>
+</inputs>
+
+<outputs>
+    <collection name="output" type="list:paired"  label="Refernce paired reads">
+        <discover_datasets pattern="(?P&lt;identifier_0&gt;[^_]+)_(?P&lt;identifier_1&gt;[^_]+)\.fq" directory="outputs" visible="true" ext="fastqsanger" />
+    </collection>
+ </outputs>
+
+ <tests>
+</tests>
+ <help>
+ </help>
+</tool>
