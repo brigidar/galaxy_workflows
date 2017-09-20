@@ -584,7 +584,7 @@ fin2=fin.reindex_axis(['molecule','refpos','gene_name','gene_start','gene_end','
 fin2.set_index(['molecule','refpos'],inplace=True)
 final=fin1.join(fin2)
 final.reset_index(inplace=True)
-pdb.set_trace()
+
 final.sort_values(by=['molecule','refpos'],inplace=True)
 #-------------------------------write file-------------------------------
 with open(output_file,'w') as output2:

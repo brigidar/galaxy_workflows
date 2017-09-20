@@ -285,7 +285,6 @@ if calc=='No' and init==(df.columns.size-1):
 #-------------------------------------------------------------------
 
 else:
-    pdb.set_trace()
     cod=df.dropna(subset=['gene_name'])
     cod.reset_index(inplace=True)
 

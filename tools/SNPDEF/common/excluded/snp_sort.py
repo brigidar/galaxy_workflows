@@ -103,16 +103,18 @@ class SNPTable:
         
         with open(exclude_file, 'rU') as input_handle:
             
-                for l in input_handle.readlines():
+                for line in input_handle.readlines():
+                    #avoid empty lines
+                    if not line.strip():
+
+                        parts = line.rstrip().split('\t')
                 
-                    parts = l.rstrip().split('\t')
-                
-                    if parts[0] == "molecule":
-                        continue
+                        if parts[0] == "molecule":
+                            continue
             
-                    else:
+                        else:
                     
-                        self._add_to_exclude_list(parts[0], int(parts[1]), int(parts[2]))
+                            self._add_to_exclude_list(parts[0], int(parts[1]), int(parts[2]))
 
 #-------------------------------------------------------------------------------
 
