@@ -66,7 +66,7 @@ def invert_nucl(nuc):
     return nuc2
 #--------------------------------------------------------------------------------
 bases=['A','C','G','T']
-def get_trans_state(base, hit):
+def ge11rans_state(base, hit):
     if hit in bases:
         if base == hit:
             return "--"
@@ -199,7 +199,7 @@ removed1.reset_index(inplace=True)
 #save file to fasta
 
 tab2=[]
-#pdb.set_trace()
+#pdb.se11race()
 for i in range(0,removed1.index.size):
     tab=[]
 
@@ -220,7 +220,7 @@ with open('table','rU') as input:
     with open(output_file,'w') as output:
         sequences = SeqIO.parse(input, "tab")
         count = SeqIO.write(sequences, output, "fasta")
-#pdb.set_trace()
+#pdb.se11race()
 #------------------------------------------------------------------------------------------
 df=df[df.index.isin(df1.index)]
 
@@ -267,7 +267,7 @@ for i,v in enumerate(dn_2['gene_name']):
             dn_ds[v]=t[t['syn?']=='NSYN']['count'].values[0] / t[t['syn?']=='SYN']['count'].values[0]
         except IndexError:
             dn_ds[v]=0
-
+st=df['strand']
 df.drop(['snps_per_gene','dn_ds','snps/gene_length','strand'],axis=1,inplace=True)
 df['dn_ds']=df['gene_name'].map(dn_ds)
 
@@ -285,6 +285,7 @@ if calc=='No' and init==(df.columns.size-1):
 #-------------------------------------------------------------------
 
 else:
+    df.insert(df.columns.size,'strand',st)
     cod=df.dropna(subset=['gene_name'])
     cod.reset_index(inplace=True)
 
@@ -340,11 +341,11 @@ else:
             if '/' in v:
                 gl=v.split('/')
                 for n in gl:
-                    qq.append(str(Seq(n, generic_dna).translate(table=t_t)))
+                    qq.append(str(Seq(n, generic_dna).translate(table=11)))
                 query_aa.append('/'.join(qq))
             else:
-                query_aa.append(str(Seq(v, generic_dna).translate(table=t_t)))
-
+                query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
+    cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
     cod.insert(cod.columns.size,'query_codon',query_codon)
     cod.insert(cod.columns.size,'query_aa',query_aa)
 
@@ -359,19 +360,19 @@ else:
     for i,v in enumerate(snp_nb2):
         ts=[]
         if len(v)==1 and v[0]!= 'No Hit':
-            ts_tv.append(get_trans_state(df.refbase[i],v[0]))
+            ts_tv.append(ge11rans_state(df.refbase[i],v[0]))
         else:
             for n in v:
                 if n!='No Hit':
-                    ts.append(get_trans_state(df.refbase[i],n))
+                    ts.append(ge11rans_state(df.refbase[i],n))
             ts_tv.append('/'.join(ts))
+    df.drop(['query_codon','query_aa','transition/transversion','syn?'],axis=1,inplace=True)
     df.insert(df.columns.size,'transition/transversion',ts_tv)
     print "Read transition/transversion"
-    df.drop('refpos_norm',axis=1,inplace=True)
 
 
     cod.set_index(['molecule','refpos'],inplace=True)
-    fin=df.join(cod)
+    fin=df.join(cod.loc[:,['query_codon','query_aa']])
     # -------------------------------synonymous nonsynonymous-------------------------------
     query_aa=fin.query_aa.astype(str).tolist()
     ref_aa=fin.ref_aa.astype(str).tolist()
