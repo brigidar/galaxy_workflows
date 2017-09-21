@@ -1,0 +1,28 @@
+<tool id="snp_interval" name="snp_interval" version="0.1">
+    <description>SNP_interval</description>
+    <command>
+        cat $input1| awk -F "\t" -v OFS="\t" '{print $1, $2-1, $2+1}'>> $out_file1  </command>
+    <inputs>
+        <param name="input1" type="data" label="input file"/>
+    </inputs>
+    <outputs>
+        <data name="out_file1" format="tabular" metadata_source="input1"/>
+    </outputs>
+
+    <help>
+.. class:: infomark
+
+**What it does**
+        
+converts SNPs interval for exclusion.
+        
+-----
+
+.. class:: infomark
+        
+**Wrapper Author**
+        
+Brigida Rusconi
+
+    </help>
+</tool>

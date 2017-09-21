@@ -40,17 +40,13 @@ class SNPTable:
         self.snps = []
         
         self.read_table_file(table_file)
-        
         if not exclude_file is None:
             self.read_exclude_file(exclude_file)
-        
-        
         print "Filtering %d snps" % (len(self.snps))
         
         self.filtered_snps = []
         
         for snp in self.snps:
-            
             if self.in_exclude(snp):
                 continue
             else:
@@ -89,7 +85,6 @@ class SNPTable:
         try:
         
             for s in self.exclude_list[snp.molecule]:
-            
                 if s[0] < snp.pos < s[1]:
                     return True
         except KeyError:
@@ -104,8 +99,7 @@ class SNPTable:
         with open(exclude_file, 'rU') as input_handle:
             
                 for line in input_handle.readlines():
-                    #avoid empty lines
-                    if not line.strip():
+                    if '\t' in line:
 
                         parts = line.rstrip().split('\t')
                 
@@ -127,7 +121,6 @@ class SNPTable:
         else:
             
             self.exclude_list[molecule] = [ (start, stop) ]
-
 #-------------------------------------------------------------------------------
 
     def write_file(self, out_file):
@@ -166,7 +159,7 @@ def __main__():
     
     #pdb.set_trace()
     snp_table = SNPTable(table_file=args.snp_table,out_file=args.out,exclude_file=args.exclude_file)
-                         
+    
     print "Done filtering %s to %s" % (args.snp_table, args.out)
 
 

@@ -241,8 +241,8 @@ for i in qindexes:
     b=df1.iloc[:,i].str.contains('\.').sum()
     c=df1.iloc[:,i].str.contains('No Hit').sum()
     counting.append((df1.index.size-(b+c)))
-
-snp_genome=DataFrame({'genomes':name_list, 'snps':counting})
+names=df1.iloc[:,qindexes].columns.values
+snp_genome=DataFrame({'genomes':names, 'snps':counting})
 
 with open('snps_per_genome.txt','w') as output3:
     snp_genome.to_csv(output3,index=False,sep='\t')
