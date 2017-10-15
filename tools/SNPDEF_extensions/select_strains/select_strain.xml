@@ -1,4 +1,5 @@
 <tool id="select strain" name="select strains in genotyper" version="0.4">
+    
     <description>select strains in genoyper output</description>
 
 <requirements>
@@ -16,28 +17,24 @@
         <param format="txt" name="snp_table" type="data" label="genotyper table"/>
          <param name="genome" type="text" label="list of genomes"/>
     </inputs>
+    
     <outputs>
-        <data format="txt" name="output_file" label="selected_genotyper.txt" from_work_dir="output.txt">
-            </data>
-        
+        <data format="txt" name="output_file" label="selected_genotyper.txt" from_work_dir="output.txt"/>
     </outputs>
     
 
     <help>
-        .. class:: infomark
-
+        <![CDATA[
 **What it does**
 
 selects strains from genotyper output
 
 -----
-
-.. class:: infomark
-
+            
 **Tool Author**
 
 Brigida Rusconi
-
+        ]]>
 
     </help>
 </tool>

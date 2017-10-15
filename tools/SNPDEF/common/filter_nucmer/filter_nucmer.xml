@@ -1,5 +1,7 @@
 <tool id="filter_nucmer" name="filter nucmer" version="0.2">
+    
     <description>filters nucmer</description>
+    
     <requirements>
         <requirement type="package" >biopython</requirement>
         <requirement type="package" >pandas</requirement>
@@ -9,26 +11,18 @@
          $__tool_directory__/filter_nucmer.py
         -n ${nucmer}
         -o output.txt
-       
-        
-    </command>
+       </command>
 
     <inputs>
         <param format="txt" name="nucmer" type="data" label="Unfiltered nucmer" help=""/>
-        
-    </inputs>
+        </inputs>
 
     <outputs>
-        <data format="txt" name="output_file" label="${nucmer.name}_filtered" from_work_dir="output.txt">
-            </data>
+        <data format="txt" name="output_file" label="${nucmer.name}_filtered" from_work_dir="output.txt"/>
     </outputs>
-    
-    <tests>
-    <!-- Empty -->
-    </tests>
 
     <help>
-.. class:: infomark
+        <![CDATA[
 
 **What it does**
 
@@ -36,12 +30,9 @@ selects repeated regions predicted by nucmer and reorders start and stop.
 
 -----
 
-.. class:: infomark
 
 **Tool Author**
 
 Brigida Rusconi
-
-
-    </help>
+ ]]>   </help>
 </tool>

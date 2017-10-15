@@ -1,0 +1,54 @@
+<tool id="rename" name="rename_tree" version="0.1">
+    
+    <description>tree renaming</description>
+    
+    <requirements>
+        <requirement type="package" >pandas</requirement>
+         <requirement type="package" >biopython</requirement>
+    </requirements>
+    
+    <command>
+        $__tool_directory__/rename.py -s $tree -n $name
+         </command>
+    
+    <inputs>
+        <param format="nwk" name="tree" type="data" label="snp tree" />
+        <param name="name" type="data" format="txt" label="name table" />
+    </inputs>
+    
+    <outputs>
+        <data format="nwk" name="output.nwk" label="${tree.name}_reordered" from_work_dir="tree.nwk"/>
+        </outputs>
+    
+    <stdio>
+        <regex match= "removed" source="stderr" level="warning" description="Just ignore this message that goes to stderr" />
+    </stdio>
+
+    
+    <help>
+        <![CDATA[
+**What it does**
+
+Changes the leaf names according to provided table provided. Original names have to be in first column and new names in second column.
+
+----
+
+**Example table**
+
+Here's an example of what a tab delimited rename table looks like::
+
+SRA123456   Strain_A
+SRA123457   Strain_B
+SRA123458   Strain_C
+SRA123459   Strain_D
+
+------
+            
+**Tool Author**
+
+Brigida Rusconi
+        ]]>
+        
+        
+    </help>
+</tool>

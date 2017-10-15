@@ -1,34 +1,35 @@
 <tool id="plasmid_grab" name="plasmid_db" version="0.1">
+    
     <description>Downloads plasmids</description>
+    
     <requirements>
         <requirement type="package" >entrez-direct</requirement>
     </requirements>
+    
     <command>
         bash $__tool_directory__/plasmid.sh ${Species} ${Info}
-        
     </command>
     
     <inputs>
         <param name="Species name" type="text" label="Species"/>
         <param name="Info" type="text" label="Info"/>
-
     </inputs>
+    
     <outputs>
-        <data format="fasta" name="output_file" label="plasmid_db" from_work_dir="output.fasta">
+        <data format="fasta" name="output_file" label="plasmid_db" from_work_dir="output.fasta"/>
     </outputs>
+    
     <help>
-        .. class:: infomark
-        
-        **What it does**
-        
-        Multifasta of all plasmids deposited for species of interest in NCBI.
-        
-        -----
-        
-        .. class:: infomark
-        
-        **Tool Author**
-        
-        Brigida Rusconi
-    </help>
+        <![CDATA[
+
+**What it does**
+
+Multifasta of all plasmids deposited for species of interest in NCBI.
+
+-----
+    
+**Tool Author**
+
+Brigida Rusconi
+   ]]> </help>
 </tool>

@@ -1,11 +1,13 @@
 <tool id="Genome_NCBI" name="Retrieve genome NCBI" version="0.1">
+    
     <description>Genome from NCBI as fasta and gbk</description>
+    
     <requirements>
         <requirement type="package" >biopython</requirement>
     </requirements>
+    
     <command interpreter='python'>
         $__tool_directory__/get_genome.py -g $Genome_ID -e $email
-    
     </command>
     
     <inputs>
@@ -13,34 +15,33 @@
         <param name="email" type="text" label="Provide email for NCBI"/>
     </inputs>
     
-    
-    
     <outputs>
-        <data format="fasta" name="output_file" label="${Genome_ID}.fasta" from_work_dir="output.fasta">
-        </data>
-        <data format="genbank" name="output_file2" label="${Genome_ID}.gb" from_work_dir="output.gb">
-        </data>
-        
+        <data format="fasta" name="output_file" label="${Genome_ID}.fasta" from_work_dir="output.fasta"/>
+        <data format="genbank" name="output_file2" label="${Genome_ID}.gb" from_work_dir="output.gb"/>
     </outputs>
     <help>
-.. class:: infomark
+<![CDATA[
+
 
 **What it does**
         
 Based on Entrez in Biopython package. Retrieves fasta and gb of genome from NCBI or WGS. Adapted fro Seqextract.py by Lee Bergstrand https://github.com/LeeBergstrand/Genbank-Downloaders/blob/master/SeqExtract.py
-        
-Example of Genome ID: NC_011149
-for WGS: AVRS01000000
+
+**Example**
+
+Genome ID:
+
+NC_011149
+
+WGS:
+
+AVRS01000000
 
 -----
 
-.. class:: infomark
     
 **Tool Author**
         
 Brigida Rusconi
-        
-        
-        
-    </help>
+   ]]> </help>
 </tool>

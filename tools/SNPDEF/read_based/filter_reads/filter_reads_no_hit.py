@@ -66,7 +66,7 @@ def invert_nucl(nuc):
     return nuc2
 #--------------------------------------------------------------------------------
 bases=['A','C','G','T']
-def ge11rans_state(base, hit):
+def get_trans_state(base, hit):
     if hit in bases:
         if base == hit:
             return "--"
@@ -113,6 +113,7 @@ parser.add_argument('-s', '--snp_table', help="snp table to sort")
 parser.add_argument('-t', '--total', help="inverted table to look at", default= "snp_filtered_table.txt")
 parser.add_argument('-r','--remove', help="remove non-canonical nucleotides", default= "False")
 parser.add_argument('-c','--recalculate', help="Were any genomes removed?", default= "No")
+parser.add_argument('-n','--no_hit', help="Keep no hits", default= "Yes")
 
 
 
@@ -122,11 +123,12 @@ input_file = args.snp_table
 output2_file = args.total
 remove=args.remove
 calc=args.recalculate
+no_h=args.no_hit
 #------------------------------------------------------------------------------------------
 
 
 #read in file as dataframe
-df =read_csv(input_file,sep='\t', dtype=object)
+df=read_csv(input_file,sep='\t', dtype=object)
 df=df.set_index(['molecule','refpos'])
 init=df.columns.size
 col_start=df.columns.values
@@ -147,7 +149,6 @@ for i in count_nohits:
         df.drop(("qbase:"+i[0]),axis=1,inplace=True)
 
 col_after=df.columns.values
-print "%s have only No Hits and were dropped" % (" ".join(setdiff1d(col_start,col_after).tolist()))
 
 
 with open('no_hits.txt','w') as output:
@@ -162,17 +163,24 @@ for i, v in enumerate(count_qbase):
 
 print "Initial SNP count " + str(df.index.size)
 
+if no_h=="Yes":
+    df=df.replace({'No Hit':'N'},regex=True)
+    print "%s have only No Hits and were replaced with N" % (" ".join(setdiff1d(col_start,col_after).tolist()))
 #replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
-ex=df
-ex=ex.replace({'No SNP':'Z'},regex=True)
-ex=ex.replace({'No Hit':'Z'},regex=True)
-exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('Z', case=False).any(), axis=1)]
-df=df[~df.index.isin(exclude.index)]
+else:
+    ex=df
+    ex=ex.replace({'No SNP':'Z'},regex=True)
+    ex=ex.replace({'No Hit':'Z'},regex=True)
+    exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('Z', case=False).any(), axis=1)]
+    df=df[~df.index.isin(exclude.index)]
+    print "%s have only No Hits and were removed" % (" ".join(setdiff1d(col_start,col_after).tolist()))
+
+
 
 print "Missing SNP removed: SNP left " + str(df.index.size)
 
 
-bases=['A','C','G','T']
+bases=['A','C','G','T','N']
 
 
 df2=df.iloc[:,qindexes]
@@ -181,19 +189,32 @@ df1=concat([df4,df2], axis=1, join_axes=[df2.index])
 cols=df1.columns
 
 # remove non-canononical snps (optional)
+
 if remove=="True":
     df3=df1[~df1[cols].isin(bases).all(axis=1)].dropna(how='all')
     df1=df1[~df1.index.isin(df3.index)]
     print "Non-canonical SNP removed: SNP left " + str( df1.index.size)
-    df1=df1[df1 !=i].dropna(how='all').fillna(i)
-    print "Identical positions removed: SNP left " + str( df1.index.size)
+    
+    for i in bases:
+        id=df1
+        id=id.replace({'N':i},regex=True)
+        id=id[id !=i].dropna(how='all')
+        df1=df1[df1.index.isin(id.index)]
+
 else:
     for i in bases:
-        df1=df1[df1 !=i].dropna(how='all').fillna(i)
-    print "Identical positions removed: SNP left " + str( df1.index.size)
+        id=df1
+        id=id.replace({'N':i},regex=True)
+        id=id[id !=i].dropna(how='all')
+        df1=df1[df1.index.isin(id.index)]
+
+
+print "Identical positions removed: SNP left " + str( df1.index.size)
 
 
 removed1=df1.T
+
+
 removed1.reset_index(inplace=True)
 #-------------------------------------------------------------------------------------
 #save file to fasta
@@ -220,7 +241,6 @@ with open('table','rU') as input:
     with open(output_file,'w') as output:
         sequences = SeqIO.parse(input, "tab")
         count = SeqIO.write(sequences, output, "fasta")
-#pdb.se11race()
 #------------------------------------------------------------------------------------------
 df=df[df.index.isin(df1.index)]
 
@@ -232,7 +252,8 @@ dn=df.groupby(['gene_name','syn?']).size().reset_index()
 dn_2=dn[dn['syn?'].str.contains('SYN')]
 dn_2.rename(columns={0:'count'},inplace=True)
 dn_ds=dict()
-    
+
+
 for i,v in enumerate(dn_2['gene_name']):
     t=dn_2[dn_2['gene_name']==v]
     if any(t['syn?'].str.contains('/')):
@@ -267,27 +288,43 @@ for i,v in enumerate(dn_2['gene_name']):
             dn_ds[v]=t[t['syn?']=='NSYN']['count'].values[0] / t[t['syn?']=='SYN']['count'].values[0]
         except IndexError:
             dn_ds[v]=0
-st=df['strand']
-df.drop(['snps_per_gene','dn_ds','snps/gene_length','strand'],axis=1,inplace=True)
+if 'strand' in df.columns.values:
+    st=df['strand']
+    df.drop(['snps_per_gene','dn_ds','snps/gene_length','strand'],axis=1,inplace=True)
+else:
+    df.drop(['snps_per_gene','dn_ds','snps/gene_length'],axis=1,inplace=True)
+    
+    df.gene_start=df.gene_start.astype(float,errors='ignore')
+    df.gene_end=df.gene_end.astype(float,errors='ignore')
+    
+    sl=df.gene_start-df.gene_end
+    
+    sl[sl < 0] = -1
+    sl[sl > 0] = 1
+    st=sl.tolist()
 df['dn_ds']=df['gene_name'].map(dn_ds)
 
 
 snps_gene=df.groupby('gene_name').size().reset_index()
+
 snps_gene2=dict(zip(snps_gene['gene_name'].tolist(),snps_gene[0].tolist()))
 df['snps_per_gene']=df['gene_name'].map(snps_gene2)
 df['snps/gene_length']=df['snps_per_gene'].astype(float, errors='ignore')/df['gene_length'].astype(float,errors='ignore')
-#if a genome was dropped because all No Hits we need to recalculate query info
-if calc=='No' and init==(df.columns.size-1):
+
+#if a genome was dropped because all No Hits we need to recalculate query info add one because strand was dropped
+if calc=='No' and init==(df.columns.size+1):
+    
     with open(output2_file,'w') as output2:
         df.to_csv(output2, sep='\t')
-
 
 #-------------------------------------------------------------------
 
 else:
+    
     df.insert(df.columns.size,'strand',st)
     cod=df.dropna(subset=['gene_name'])
     cod.reset_index(inplace=True)
+    
 
     count_qbase2=list(cod.columns.values)
     qindexes2=[]
@@ -316,22 +353,25 @@ else:
             #positions on -1 strand need to be inverted use invert_nucl function
             if cod['strand'][i]==1:
                 ts=list()
-                if len(v)==1:
+                if len(v)==1 and v!='N':
                     query_codon.append(missing_char(str(ref_codon[i]),pos1[i],v[0]))
                 else:
                     #multiallelic position gets codon for each
                     for n in v:
-                        ts.append(missing_char(str(ref_codon[i]),pos1[i],n[0]))
+                        if n != 'N':
+                            ts.append(missing_char(str(ref_codon[i]),pos1[i],n[0]))
                     query_codon.append('/'.join(ts))
             else:
                 ts=list()
-                if len(v)==1:
+                if len(v)==1 and v!='N':
                     query_codon.append(missing_char(str(ref_codon[i]),pos1[i],invert_nucl(v[0])))
                 else:
                             #multiallelic position gets codon for each
                     for n in v:
-                        ts.append(missing_char(str(ref_codon[i]),pos1[i],invert_nucl(n[0])))
-                        query_codon.append('/'.join(ts))
+                        if n != 'N':
+                            ts.append(missing_char(str(ref_codon[i]),pos1[i],invert_nucl(n[0])))
+                    query_codon.append('/'.join(ts))
+    
     query_aa=[]
     for i,v in enumerate(query_codon):
         qq=[]
@@ -346,6 +386,7 @@ else:
             else:
                 query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
     cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
+
     cod.insert(cod.columns.size,'query_codon',query_codon)
     cod.insert(cod.columns.size,'query_aa',query_aa)
 
@@ -359,12 +400,12 @@ else:
     ts_tv=[]
     for i,v in enumerate(snp_nb2):
         ts=[]
-        if len(v)==1 and v[0]!= 'No Hit':
-            ts_tv.append(ge11rans_state(df.refbase[i],v[0]))
+        if len(v)==1 and v[0]!= 'N':
+            ts_tv.append(get_trans_state(df.refbase[i],v[0]))
         else:
             for n in v:
-                if n!='No Hit':
-                    ts.append(ge11rans_state(df.refbase[i],n))
+                if n!='N':
+                    ts.append(get_trans_state(df.refbase[i],n))
             ts_tv.append('/'.join(ts))
     df.drop(['query_codon','query_aa','transition/transversion','syn?'],axis=1,inplace=True)
     df.insert(df.columns.size,'transition/transversion',ts_tv)
@@ -453,13 +494,14 @@ else:
                 dn_ds[v]=0
 
     fin['dn_ds']=fin['gene_name'].map(dn_ds)
-    fin1=fin.iloc[:,1:(max(qindexes)+3)]
+    fin1=fin.iloc[:,1:(max(qindexes)+4)]
     fin1.set_index(['molecule','refpos'],inplace=True)
     fin2=fin.reindex_axis(['molecule','refpos','gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds','strand'],axis=1)#'dn/ds'
     fin2.set_index(['molecule','refpos'],inplace=True)
     final=fin1.join(fin2)
     final.reset_index(inplace=True)
     final.sort_values(by=['molecule','refpos'],inplace=True)
+
     with open(output2_file,'w') as output2:
         final.to_csv(output2, sep='\t',index=False)
 

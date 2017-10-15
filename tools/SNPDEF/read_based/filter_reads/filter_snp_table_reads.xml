@@ -1,16 +1,20 @@
-<tool id="Filter_snp_table_reads" name="filter_snp_table_reads" version="0.1">
-    <description>Filtered SNP table and fasta from reads</description>
+<tool id="Filter_snp_panel_reads" name="filter_snp_panel_reads" version="0.1">
+    
+    <description>Filtered SNP panel and fasta from reads</description>
+    
     <requirements>
         <requirement type="package" >biopython</requirement>
         <requirement type="package" >pandas</requirement>
     </requirements>
+    
     <command interpreter="python">
-        $__tool_directory__/filter_reads.py
+        $__tool_directory__/filter_reads_no_hit.py
         -s ${snp_table}
         -o output_file.fasta
         -t total.txt
         -r $remove
         -c $recalc
+        -n $no_hit
     </command>
 
     <inputs>
@@ -22,6 +26,10 @@
         <param name="recalc" type="select" label="If a genome was removed put yes" help="">
             <option value="No" selected='True'>No</option>
             <option value="Yes">Yes</option>
+        </param>
+        <param name="no_hit" type="select" label="keep no hits" help="">
+            <option value="Yes" selected='True'>Yes</option>
+            <option value="No">No</option>
         </param>
     </inputs>
 
@@ -38,23 +46,18 @@
         <regex match= "removed" source="stderr" level="warning" description="Just ignore this message that goes to stderr" />
     </stdio>
 
-    <tests>
-    <!-- Empty -->
-    </tests>
-
     <help>
-.. class:: infomark
-
+        <![CDATA[
+            
 **What it does**
 
-Removes no SNPs and positions with no hit. Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies.
+Removes no SNPs and optional positions with no hit (default=g=kept). Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies (default=removed). Provides annotation for identified SNPs.
 
 -----
-
-.. class:: infomark
 
 **Tool Author**
 
 Brigida Rusconi
+        ]]>
     </help>
 </tool>

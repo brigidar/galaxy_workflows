@@ -1,5 +1,7 @@
 <tool id="count_SNP" name="Count_SNP" version="0.1">
+    
     <description>count SNP provided by each genome</description>
+    
     <command>
 #for $input in $inputs#
 wc -l $input >> len.txt;
@@ -7,20 +9,18 @@ echo '$input.element_identifier' >> names.txt;
 #end for#
 cut -f 6 -d ' ' len.txt >length.txt;
 paste names.txt length.txt > output.txt;
-
     </command>
+    
     <inputs>
         <param type="data" name="inputs" label="Input SNP files" format="txt" multiple="true" />
     </inputs>
+    
     <outputs>
-       <data format="txt" name="output" from_work_dir="output.txt" >
-       
-       </data>
+       <data format="txt" name="output" from_work_dir="output.txt"/ >
     </outputs>
     
-
     <help>
-.. class:: infomark
+        <![CDATA[
 
 **What it does**
 
@@ -28,10 +28,8 @@ counts all the SNPs that each genome provides. Use to identify outliers or conta
 
 -----
 
-.. class:: infomark
-
 **Wrapper Author**
 
 Brigida Rusconi
-    </help>
+  ]]>  </help>
 </tool>

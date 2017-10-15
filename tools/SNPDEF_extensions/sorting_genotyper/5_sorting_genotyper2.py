@@ -33,7 +33,7 @@ ref_genome= args.refgenome
 
 #read in files as dataframe
 df =read_csv(input_file, sep='\t', header=0, dtype=str)
-
+df=df.fillna('--')
 
 #-------------------------PI/NI counting-----------------------------------------------------------------------------------
 

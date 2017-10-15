@@ -32,12 +32,13 @@
     
     
     <help>
-.. class:: infomark
-        
+        <![CDATA[
+
 **Example SNP Panel**:
 Takes a merged snp table and a tab delimited file of snp ranges for filtering in the format:
 
 ------
+
 
     molecule    start   stop
     NC_011353.1 273971  274038
@@ -48,21 +49,17 @@ Takes a merged snp table and a tab delimited file of snp ranges for filtering in
     
 ------
         
-.. class:: infomark
         
 **Tool Author**
         
 Mando Rodriguez, with consulting from Brigida Rusconi
-        
-        
+
 ------
         
-.. class:: infomark
         
 **Tool Help and Usage**
         
-::
-        
+
         
         usage: snp_sort.py [-h] -s snp_panel_file -f exclude_file
         [-o sorted_snp_output_file]
@@ -82,7 +79,5 @@ Mando Rodriguez, with consulting from Brigida Rusconi
         rt_pos,stop_pos/molecule_name:start_pos,stop_pos With
         molecule name, colon, then pipe delimited list of
         start,stop positions.
-        
-        
-    </help>
+    ]]></help>
 </tool>

@@ -1,4 +1,5 @@
 <tool id="genotyper_sort" name="genotyper summary" version="0.2">
+    
     <description>summary of genoyper output</description>
 
 <requirements>
@@ -18,35 +19,28 @@
          <param name="refgenome_name" type="text" label="name of refgenome"/>
     </inputs>
 
-
     <outputs>
-        <data format="txt" name="output_file" label="summary genotyper" from_work_dir="output.txt">
-            </data>
-        <data format="txt" name="output_file2" label="summary percentage" from_work_dir="percentage_summary.txt">
-        </data>
-        <data format="txt" name="output_file3" label="summary groups" from_work_dir="summary_groups.txt">
-        </data>
-
-        
+        <data format="txt" name="output_file" label="summary genotyper" from_work_dir="output.txt"/>
+        <data format="txt" name="output_file2" label="summary percentage" from_work_dir="percentage_summary.txt"/>
+        <data format="txt" name="output_file3" label="summary groups" from_work_dir="summary_groups.txt"/>
     </outputs>
     
-
+    <stdio>
+        <regex match= "UserWarning" source="stderr" level="warning" description="Just ignore this message that goes to stderr" />
+    </stdio>
 
     <help>
-.. class:: infomark
-
+        <![CDATA[
 **What it does**
 
 Makes several summary files of genotyper output.
 
 -----
-
-.. class:: infomark
-
+            
 **Tool Author**
 
 Brigida Rusconi
-
+]]>
 
     </help>
 </tool>

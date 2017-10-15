@@ -1,9 +1,11 @@
 <tool id="bedtools_getfasta" name="GetFasta" version="0.3.0">
     
     <description> Extracts fasta from bed file.</description>
+    
     <requirements>
     <requirement type="package" >bedtools</requirement>
     </requirements>
+    
     <command>
         bedtools getfasta -fi '$input' -bed '$bedfile' -fo output.out
     </command>
@@ -18,7 +20,7 @@
     </outputs>
     
     <help>
-.. class:: infomark
+        <![CDATA[
 
 **What it does**
         
@@ -26,14 +28,9 @@ This tool converts a BED file into extracted fasta regions by using bedtools dev
 
 -----
 
-.. class:: infomark
-
 **Wrapper Author**
         
 Brigida Rusconi
-
-        
-        
-        
+  ]]>
     </help>
 </tool>

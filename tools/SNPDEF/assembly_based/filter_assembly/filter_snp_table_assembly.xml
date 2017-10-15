@@ -1,22 +1,31 @@
-<tool id="Filter_snp_table_assembly" name="filter_snp_table_assembly" version="0.3">
-    <description>Filtered SNP table and fasta from assembies</description>
+<tool id="Filter_snp_panel_assembly" name="filter_snp_panel_assembly" version="0.3">
+    
+    <description>Filtered SNP panel and fasta from assembies</description>
+    
     <requirements>
         <requirement type="package">biopython</requirement>
         <requirement type="package">pandas</requirement>
     </requirements>
+    
     <command interpreter="python">
         $__tool_directory__/2_sort_2.py
         -s ${snp_table}
         -o output_file.fasta
         -t total.txt
         -r $remove
+        -n $no_hit
     </command>
 
     <inputs>
-        <param format="txt" name="snp_table" type="data" label="Unfiltered snp table" help=""/>
-        <param name="remove" type="text" label="Write True if you want to remove non-canonical nucleotides" help=""/>
-
-        
+        <param format="txt" name="snp_table" type="data" label="Unfiltered snp panel" help=""/>
+        <param name="remove" type="select" label="select false if you want to keep non-canonical" help="">
+            <option value="True" selected='True'>True</option>
+            <option value="False">False</option>
+        </param>
+        <param name="no_hit" type="select" label="keep no hits" help="">
+            <option value="Yes" selected='True'>Yes</option>
+            <option value="No">No</option>
+        </param>
     </inputs>
 
     <outputs>
@@ -25,24 +34,19 @@
         <data format="tabular" name="total" label="filtered_${snp_table.name}.txt" from_work_dir="total.txt" >
             </data>
     </outputs>
-    
-    <tests>
-    <!-- Empty -->
-    </tests>
 
     <help>
-.. class:: infomark
+        <![CDATA[
 
 **What it does**
 
-Removes ambigous SNPs within the same genome and positions with no hit. Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies.
+Removes ambigous SNPs within the same genome and positions with option to remove no hit (default kept). Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies (default removed).
 
 -----
-
-.. class:: infomark
 
 **Tool Author**
 
 Brigida Rusconi
+        ]]>
     </help>
 </tool>

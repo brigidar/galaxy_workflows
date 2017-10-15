@@ -1,26 +1,31 @@
 <tool id="sed_stream_editor" name="Manipulation" version="0.0.1">
+    
   <description>of text lines with regular expressions (sed)</description>
-  <command>sed '$pattern' $input > $outfile</command>
+  
+  <requirements>
+      <requirement type="binary">sed</requirement>
+  </requirements>
+  
+  <command>
+      sed '$pattern' $input > $outfile
+  </command>
+  
   <inputs>
     <param format="txt, tabular" name="input" type="data" label="Replace lines from"/>
     <param name="pattern" size="40" type="text" value="" label="the pattern" help="here you can enter your sed expression (No syntax check or sanitising!)" />
   </inputs>
+  
   <outputs>
     <data format="input" name="outfile" metadata_source="input"/>
   </outputs>
+  
   <options sanitize="False"/>
- <requirements>
-    <requirement type="binary">sed</requirement>
- </requirements>
-  <tests>
+ 
 
-  </tests>
   <help>
 
-.. class:: warningmark
-
+<![CDATA[
 Use with caution! Its a plain wrapper around **sed** and the input is not sanitized.
-
 
 -----
 
@@ -44,10 +49,11 @@ Use the **sed**-syntax -&gt; **s/find-pattern/replace-pattern/**
 - **s/\\s.*//** Splits a string after whitespaces and replaces the rest with nothing.
 - **s/\\S*\\s*//** Splits a string after whitespaces and replaces the first part with nothing.
 
-.. class:: infomark
 
 **Tool Author**
 
-Modified from Bjoern Gruening sed wrapper
+Modified from Bjoern Gruening sed wrapper by Brigida Rusconi
+]]>
+
 </help>
 </tool>

@@ -663,6 +663,7 @@
         </test>
     </tests>
     <help>
+            <![CDATA[
 **What it does**
 
 FreeBayes is a Bayesian genetic variant detector designed to find small polymorphisms, specifically SNPs (single-nucleotide polymorphisms), indels (insertions and deletions), MNPs (multi-nucleotide polymorphisms), and complex events (composite insertion and substitution events) smaller than the length of a short-read sequencing alignment.
@@ -699,11 +700,10 @@ Galaxy allows six levels of control over FreeBayes options provided by **Choose 
 
 **FreeBayes options**
 
-.. class:: infomark
 
 Note that each Galaxy parameter widget corresponding to command line flags listed below:
 
-Input and output::
+Input and output:
 
    -t --targets FILE
                    Limit analysis to targets listed in the BED-format FILE.
@@ -751,13 +751,13 @@ Input and output::
                    considered alleles, even those which are not in called genotypes.
                    Loci which do not have any potential alternates have '.' for ALT.
 
-Reporting::
+Reporting:
 
    -P --pvar N     Report sites if the probability that there is a polymorphism
                    at the site is greater than N.  default: 0.0.  Note that post-
                    filtering is generally recommended over the use of this parameter.
 
-Population model::
+Population model:
 
    -T --theta N    The expected mutation rate or pairwise nucleotide diversity
                    among the population under analysis.  This serves as the
@@ -774,7 +774,7 @@ Population model::
                    Output all alleles which pass input filters, regardles of
                    genotyping outcome or model.
 
-Reference allele::
+Reference allele:
 
    -Z --use-reference-allele
                    This flag includes the reference allele in the analysis as
@@ -783,7 +783,7 @@ Reference allele::
                    Assign mapping quality of MQ to the reference allele at each
                    site and base quality of BQ.  default: 100,60
 
-Allele scope::
+Allele scope:
 
    -I --no-snps    Ignore SNP alleles.
    -i --no-indels  Ignore insertion and deletion alleles.
@@ -807,12 +807,12 @@ Allele scope::
                    detection window.  (default, use all observations, dividing partial
                    support across matching haplotypes when generating haplotypes.)
 
-Indel realignment::
+Indel realignment:
 
    -O --dont-left-align-indels
                    Turn off left-alignment of indels, which is enabled by default.
 
-Input filters::
+Input filters:
 
    -4 --use-duplicate-reads
                    Include duplicate-marked alignments in the analysis.
@@ -868,13 +868,13 @@ Input filters::
    -! --min-coverage N
                    Require at least this coverage to process a site.  default: 0
 
-Population priors::
+Population priors:
 
    -k --no-population-priors
                    Equivalent to --pooled-discrete --hwe-priors-off and removal of
                    Ewens Sampling Formula component of priors.
 
-Mappability priors::
+Mappability priors:
 
    -w --hwe-priors-off
                    Disable estimation of the probability of the combination
@@ -888,7 +888,7 @@ Mappability priors::
                    Disable use of aggregate probability of observation balance between alleles
                    as a component of the priors.
 
-Genotype likelihoods::
+Genotype likelihoods:
 
    --observation-bias FILE
                    Read length-dependent allele observation biases from FILE.
@@ -909,7 +909,7 @@ Genotype likelihoods::
                        sample p(read=R|genotype=AR) p(read=A|genotype=AA)
                    Sample '*' can be used to set default contamination estimates.
 
-Algorithmic features::
+Algorithmic features:
 
    --report-genotype-likelihood-max
                    Report genotypes using the maximum-likelihood estimate provided
@@ -947,10 +947,11 @@ Algorithmic features::
 
 **Citation**
 
-For the underlying tool, please cite `Erik Garrison and Gabor Marth. Haplotype-based variant detection from short-read sequencing &lt;http://arxiv.org/abs/1207.3907&gt;`_.
+For the underlying tool, please cite `Erik Garrison and Gabor Marth. Haplotype-based variant detection from short-read sequencing http://arxiv.org/abs/1207.3907
 
 The initial version of the wrapper was produced by Dan Blankenberg and upgraded by Anton Nekrutenko.
 TNG was developed by Bjoern Gruening
+]]>
 
     </help>
     <citations>

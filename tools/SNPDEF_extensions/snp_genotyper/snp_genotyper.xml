@@ -1,5 +1,7 @@
 <tool id="genotyper" name="genotyper tool" version="0.2">
-    <description>generates genotypes from SNP table </description>
+    
+    <description>generates genotypes from SNP panel </description>
+    
     <requirements>
         <requirement type="package">biopython</requirement>
     </requirements>
@@ -11,33 +13,26 @@
     </command>
 
     <inputs>
-        <param format="txt" name="snp_table" type="data" label="genotyper table"/>
+        <param format="txt" name="snp_table" type="data" label="snp panel"/>
             <param format="integer" name="number" type="integer" value="11" label="translation code"/>
     </inputs>
     <outputs>
-        <data format="txt" name="output_file" label="${tool.name} on ${on_string}: genotype" from_work_dir="snp_genotype_out.txt">
-            </data>
+        <data format="txt" name="output_file" label="${tool.name} on ${on_string}: genotype" from_work_dir="snp_genotype_out.txt"/>
     </outputs>
-    
-    <tests>
-    <!-- Empty -->
-    </tests>
+
 
     <help>
-        .. class:: infomark
-
+<![CDATA[
 **What it does**
 
-generates  genotype from filtered SNP table
+generates  genotype from filtered SNP panel
 
 -----
-
-.. class:: infomark
 
 **Tool Author**
 
 Armando Rodriguez
-
+]]>
 
     </help>
 </tool>

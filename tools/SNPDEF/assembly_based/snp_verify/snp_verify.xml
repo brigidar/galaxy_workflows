@@ -1,8 +1,7 @@
 <tool id="snp_verify" name="SNP Verify" version="1.16.0">
-
-    <!-- Wrapper currently just works for the perl script supplied -->
-    <!-- syntax for the tool xml  https://wiki.galaxyproject.org/Admin/Tools/ToolConfigSyntax -->
-    <description>Perform a verification of SNPs on BLAST data</description>
+    
+    <description>Perform verification and annotation of SNPs on BLAST data</description>
+    
     <requirements>
         <requirement type="package">biopython</requirement>
         <requirement type="package">pandas</requirement>
@@ -61,14 +60,8 @@
 
             ## Outputs.
             --out ${merged_table}
-            
     </command>
-    <stdio>
-       <regex match="BiopythonExperimentalWarning" 
-           source="stderr" 
-           level="warning" 
-           description="Just ignore this message that goes to stderr. Just a biopython warning.\n" />
-    </stdio>
+
     <inputs>
 
 	<param name="threshold" type="float" size="10" value="0.0" label="Minimal quality BLAST bitscore" help="Threshold for the BLAST records bitscore. Anything below will be pruned out."/>
@@ -101,25 +94,19 @@
 
         </conditional>
 
-
-
-
         <param name="flanking_bases" type="integer" value="20" label="Number of bases on each side of the SNP positions in the reference genome" />
-
-
+        
         <!-- These are the inputs for the blast_results.list file that must be created  -->
         <param format="txt" name="blast_input" type="data" label="Raw blast output result file" help=""/>
         <repeat name="blast_input_files" title="Additional BLAST result files">
             <param format="txt" name="additional_blast_input" type="data" label="Raw blast output result file" help=""/>
         </repeat>
-
-
+        
         <!-- This is for the inputs to the reference_genbank.list  -->
         <param format="gen" name="genbank_input" type="data" label="Genbank reference annotation file" help=""/>
         <repeat name="genbank_input_files" title="Additional Genbank reference annotation">
             <param format="gen" name="additional_genbank_input" type="data" label="Additional Genbank reference annotation" help=""/>
         </repeat>
-
 
         <!-- This is for the file that contains the snp panel inputs  -->
         <param format="tabular" name="snp_panel_input" type="data" label="File with predicted SNP positions (SNP panel) in the reference genome(s)." help=""/>
@@ -127,40 +114,30 @@
             <param format="txt" name="additional_snp_panel_input" type="data" label="Additional SNP panel files" help=""/>
         </repeat>
 
-
         <!-- This is for the fasta file list for the query genome -->
 
         <param name="query_genome_input_files" type="data" multiple="true" optional="false" format="fasta" size="50" label="Query Contig FASTA file" help="The plugin will attempt to parse out the Galaxy*-[file]. from the input and only put the filename in the column header">
         </param>
 
-
-
     </inputs>
 
     <outputs>
-
         <data format="tabular" name="merged_table" label="${tool.name} on ${on_string}: merged tables"/>
-        
     </outputs>
 
-    <tests>
-        <!--
-            Nothing yet
-        -->
-        <test>
- 
-
-        </test>
-    </tests>
+<stdio>
+    <regex match="BiopythonExperimentalWarning"
+    source="stderr"
+    level="warning"
+    description="Just ignore this message that goes to stderr. Just a biopython warning.\n" />
+</stdio>
 
     <help>
-.. class:: warningmark
+        <![CDATA[
 
 **This tool currently only works on raw text blast result files.**
 
 ------
-
-.. class:: infomark
 
 **What it does**
 
@@ -170,36 +147,27 @@ as well as gene information from the genbank files, and translation informations
 
 ------
 
-.. class:: infomark
-
 **Example SNP Panel**
 
 Here's an example of what a tab delimited SNP panel file looks like::
 
-  AE003852.1	53458
+  AE003852.1   	53458
   AE003852.1	53471
   AE003852.1	53506
   AE003852.1	53521
 
 The first column is the molecule name as referenced in the genbank file. The second column is the SNP position.
 
-
 ------
-
-.. class:: infomark
 
 **Tool Author**
 
 Mando Rodriguez M.S, with consulting from Brigida Rusconi Ph.D
 
-
 ------
-
-.. class:: infomark
 
 **Tool Help and Usage**
 
-::
 
 
  usage: snp_verify.py [-h] [-w bfiles.list]
@@ -270,6 +238,6 @@ Mando Rodriguez M.S, with consulting from Brigida Rusconi Ph.D
 			 File with list of query genomes with one per line
    -q [qfile.fasta [qfile.fasta ...]], --query [qfile.fasta [qfile.fasta ...]]
 			 list of query files separated by spaces.
-
+]]>
    </help>
 </tool>

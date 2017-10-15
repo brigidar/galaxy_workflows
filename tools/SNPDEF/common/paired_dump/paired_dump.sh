@@ -1,6 +1,6 @@
 #!/bin/bash
 
-esearch -db sra -query $1 | efetch --format runinfo | cut -d ',' -f 1 | grep SRR >srr.txt;
+esearch -db sra -query $1 | efetch --format xml | xtract -pattern EXPERIMENT_PACKAGE -match LIBRARY_STRATEGY:WGS -element PRIMARY_ID| cut -f 8 >srr.txt;
 cat srr.txt | while read LINE
 do
 SUB=$(echo $LINE | cut -c 1-6)

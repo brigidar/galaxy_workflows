@@ -225,13 +225,15 @@ df1.fillna('No Hit', inplace=True)
 df1.mask(df1['refbase'].str.len()>1,inplace=True)
 df1.dropna(inplace=True)
 #check if any complex event are still present, should be obsolete with new freebayes settings
-comple=df1.iloc[:,qindexes]
-colm=list(comple.columns.values)
-for i in colm:
-    comple.mask(comple[i].astype(str).str.contains(','),inplace=True)
-clean_df=comple.dropna()
-df1=df1[df1.index.isin(clean_df.index)]
-
+try:
+    comple=df1.iloc[:,qindexes]
+    colm=list(comple.columns.values)
+    for i in colm:
+        comple.mask(comple[i].astype(str).str.contains(','),inplace=True)
+    clean_df=comple.dropna()
+    df1=df1[df1.index.isin(clean_df.index)]
+except KeyError:
+    pass
 
 
 
