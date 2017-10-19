@@ -16,7 +16,7 @@ paste names.txt length.txt > output.txt;
     </inputs>
     
     <outputs>
-       <data format="txt" name="output" from_work_dir="output.txt"/ >
+       <data format="txt" name="output" from_work_dir="output.txt"/>
     </outputs>
     
     <help>
