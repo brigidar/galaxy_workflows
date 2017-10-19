@@ -1,4 +1,4 @@
-<tool id="raxml_SNPDEF" name="Phyogenetic reconstruction with RaXML" version="8.2.4">
+<tool id="raxml_SNPDEF" name="RaXML_SNPDEF" version="8.2.4">
     
     <description>- Maximum Likelihood based inference of large phylogenetic trees</description>
     
