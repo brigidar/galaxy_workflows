@@ -214,7 +214,12 @@ for i,f in enumerate(df1['molecule']):
     except KeyError:
         continue
 
-
+for i,f in enumerate(df1['molecule']):
+    try:
+        if '.' in df1['molecule'][i]:
+            df1['molecule'][i]=f.split('.')[0]
+    except KeyError:
+        continue
 #qindexes w/o molecule and refpos as indexes!!!
 count_qbase=list(df1.columns.values)
 qindexes=[]
@@ -593,9 +598,6 @@ with open(output_file,'w') as output2:
     final.to_csv(output2, sep='\t', index=False)
 
 
-#pdb.set_trace()
-#with open('snp_multiple_genes.txt','w') as output2:
-#    duplicates.to_csv(output2, sep='\t', index=False)
 
 
 
