@@ -26,16 +26,16 @@ stop=args.stop
 
 tree=Phylo.read(input_file,'newick')
 
-for clade in tree.get_nonterminals():
-    if clade.comment is None :
-        continue
-    else:
-        clade.confidence=int(clade.comment)
-        clade.comment=None
+#for clade in tree.get_nonterminals():
+#    if clade.comment is None :
+#        continue
+#    else:
+#        clade.confidence=int(clade.comment)
+#        clade.comment=None
 
 tree.root_with_outgroup(start,stop)
 
 with open('tree.nwk','w') as output:
-    Phylo.write(tree,output,'newick')
+    Phylo.write(tree,output,'newick',format_branch_length='%1.10f')
 
 

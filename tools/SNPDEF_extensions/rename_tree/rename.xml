@@ -12,12 +12,12 @@
          </command>
     
     <inputs>
-        <param format="nwk" name="tree" type="data" label="snp tree" />
+        <param format="txt" name="tree" type="data" label="snp tree" />
         <param name="name" type="data" format="txt" label="name table" />
     </inputs>
     
     <outputs>
-        <data format="nwk" name="output.nwk" label="${tree.name}_reordered" from_work_dir="tree.nwk"/>
+        <data format="txt" name="output.nwk" label="${tree.name}_renamed" from_work_dir="tree.nwk"/>
         </outputs>
     
     <stdio>
@@ -29,7 +29,7 @@
         <![CDATA[
 **What it does**
 
-Changes the leaf names according to provided table provided. Original names have to be in first column and new names in second column.
+Changes the leaf names according to table provided. Original names have to be in first column and new names in second column.
 
 ----
 
