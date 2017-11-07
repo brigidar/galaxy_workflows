@@ -10,13 +10,13 @@
     </command>
 
     <inputs>
-        <param format="nwk" name="tree" type="data" label="snp tree" help=""/>
+        <param format="txt" name="tree" type="data" label="snp tree" help=""/>
         <param name="start" type="text" label="Write 1st leaf name for rerooting" help=""/>
         <param name="stop" type="text" label="Write  2nd leaf name for rerooting" help=""/>
     </inputs>
 
     <outputs>
-        <data format="nwk" name="output.nwk" label="${tree.name}_reordered" from_work_dir="tree.nwk"/>
+        <data format="txt" name="output.nwk" label="${tree.name}_reordered" from_work_dir="tree.nwk"/>
     </outputs>
     
     <stdio>
