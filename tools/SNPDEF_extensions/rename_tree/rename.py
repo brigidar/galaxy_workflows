@@ -33,6 +33,5 @@ for clade in tree.find_clades():
         continue
     else:
         clade.name=nam1[clade.name]
-
 with open('tree.nwk','w') as output:
-    Phylo.write(tree,output,'newick')
+    Phylo.write(tree,output,'newick',format_branch_length='%1.10f')
