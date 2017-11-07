@@ -27,10 +27,7 @@
             <option value="No" selected='True'>No</option>
             <option value="Yes">Yes</option>
         </param>
-        <param name="no_hit" type="select" label="keep no hits" help="">
-            <option value="Yes" selected='True'>Yes</option>
-            <option value="No">No</option>
-        </param>
+        <param name="no_hit" type="text" label="keep no hits"/>
     </inputs>
 
     <outputs>
