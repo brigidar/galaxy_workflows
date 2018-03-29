@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<repositories description="A suite of tools associated with SNVphyl pipeline">
+    <repository changeset_revision="62faa1906fd7" name="smalt_map" owner="nml" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="1e249f90f2a6" name="smalt_index" owner="nml" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="a17498c603ec" name="prokka" owner="crs4" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="81948c6e4d4d" name="samtools_mpileup" owner="devteam" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="3628f89cb4ee" name="bcftools_view" owner="nml" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="98f8a44014c1" name="bcftools_call" owner="nml" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="3205c22bc968" name="regex_find_replace" owner="jjohnson" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="03352fbf5d68" name="spades" owner="iuc" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="069b6b601fad" name="trimmomatic" owner="sanbi-uwc" toolshed="https://testtoolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="48f306c57611" name="bwa" owner="devteam" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="d9f3d4779507" name="mummer" owner="peterjc" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="6753195df9e0" name="mummer_toolsuite" owner="abossers" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="7538e2bfcd41" name="ncbi_blast_plus" owner="devteam" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="12ac67b5c81d" name="sed_wrapper" owner="bjoern-gruening" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="a43de04b5a62" name="unique_line" owner="xuebing" toolshed="https://toolshed.g2.bx.psu.edu" />
+    
+    <repository changeset_revision="" name="freebayes_list" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="read_SNPDEF" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="filter_snp_panel_reads" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="snp location to bed format" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="Concat text files" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="SNP Sort/Filter Filter" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="filter blastn" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="filter nucmer" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="Extract SNP Region" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="SNP Verify" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="filter_snp_panel_assembly" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="Concat fasta files" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="RaXML_SNPDEF" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="reroot" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="genotyper tool" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="genotyper tool" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="genotyper summary" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="plot SNPS" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="reorder snp panel" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="rename_tree" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="Bioproject Fastq Dump" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="drop one column" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="drop_fasta" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="mutator" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="plasmid_db" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+    <repository changeset_revision="" name="Retrieve genome NCBI" owner="mel" toolshed="https://toolshed.g2.bx.psu.edu" />
+
+    
+    
+    
+</repositories>
