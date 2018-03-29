@@ -169,9 +169,9 @@ if no_h=="Yes":
 #replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
 else:
     ex=df
-    ex=ex.replace({'No SNP':'Z'},regex=True)
-    ex=ex.replace({'No Hit':'Z'},regex=True)
-    exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('Z', case=False).any(), axis=1)]
+    ex=ex.replace({'No SNP':'ZX'},regex=True)
+    ex=ex.replace({'No Hit':'ZX'},regex=True)
+    exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('ZX', case=False).any(), axis=1)]
     df=df[~df.index.isin(exclude.index)]
     print "%s have only No Hits and were removed" % (" ".join(setdiff1d(col_start,col_after).tolist()))
 
@@ -297,7 +297,7 @@ else:
     df.gene_start=df.gene_start.astype(float,errors='ignore')
     df.gene_end=df.gene_end.astype(float,errors='ignore')
     
-    sl=df.gene_start-df.gene_end
+    sl=df.gene_end-df.gene_start
     
     sl[sl < 0] = -1
     sl[sl > 0] = 1
