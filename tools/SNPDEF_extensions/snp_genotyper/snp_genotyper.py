@@ -454,7 +454,7 @@ def load_table(table_file):
 
 
     # returning everything in a tuple
-    print "Loaded %d SNPs from file '%s' with %d qbases per SNP.\n" % (len(snp_objects), table_file, len(qindexes))
+    #print "Loaded %d SNPs from file '%s' with %d qbases per SNP.\n" % (len(snp_objects), table_file, len(qindexes))
     
     return (header, qindexes, snp_objects)
 
@@ -483,7 +483,7 @@ def group_file(group_dict, outfile):
 
             of.write(line+"\n")
 
-    print "Write a group file to '%s'" % outfile
+    #print "Write a group file to '%s'" % outfile
 
 #-------------------------------------------------------------------------------
 # Main function call
@@ -553,7 +553,7 @@ def __main__():
 
             of.write(line)
 
-    print "Output %d SNPs to file %s" % (len(snp_objects), output_file)
+    #print "Output %d SNPs to file %s" % (len(snp_objects), output_file)
 
 
     # If we want to write a group file out we do it here.

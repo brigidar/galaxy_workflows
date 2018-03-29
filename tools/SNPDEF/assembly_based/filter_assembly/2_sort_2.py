@@ -116,16 +116,16 @@ df =read_csv(input_file,sep='\t', dtype=object)
 df=df.set_index(['molecule','refpos']).fillna('--')
 
 
-print "merged table number SNPS " + str(df.index.size)
+#print "merged table number SNPS " + str(df.index.size)
 
 #------------------------------------------------------------------------------------------
 #replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
 if no_h=='No':
     df=df.mask(df=='No Hit').dropna()
-    print "No Hit removed: SNP left " + str(df.index.size)
+#print "No Hit removed: SNP left " + str(df.index.size)
 else:
     df=df.replace({'No Hit':'N'},regex=True)
-    print " No Hits and were replaced with N"
+#print " No Hits and were replaced with N"
 
 #------------------------------------------------------------------------------------------
 # only columns with qbase and refbase in table
@@ -218,7 +218,7 @@ for i,v in enumerate(df2_p.index):
 
 slash=df2_p.drop(sl)
 
-print "double hits removed: SNP left " + str(slash.index.size)
+#print "double hits removed: SNP left " + str(slash.index.size)
 slash2=concat([ref,slash], axis=1, join_axes=[slash.index])
 
 #------------------------------------------------------------------------------------------
@@ -245,7 +245,7 @@ else:
             id=id[id !=i].dropna(how='all')
             df1=df1[df1.index.isin(id.index)]
     
-print "identical lines removed: SNP left " + str( slash2.index.size)
+#print "identical lines removed: SNP left " + str( slash2.index.size)
 
 #------------------------------------------------------------------------------------------
 #replaces lines with indel
@@ -254,7 +254,7 @@ indel=slash2.mask(slash2=='indel').dropna()
 
 
 #------------------------------------------------------------------------------------------
-print "removed lines with short alignment %s lines left" % (str(indel.index.size))
+#print "removed lines with short alignment %s lines left" % (str(indel.index.size))
 final2 =indel.reset_index(drop=True).T #drops indexes of molecule and refpos
 final2.reset_index(inplace=True)
 
@@ -355,7 +355,7 @@ cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=Tru
 cod.insert(cod.columns.size,'query_codon',query_codon)
 cod.insert(cod.columns.size,'query_aa',query_aa)
 
-print "Read query codons and aa"
+#print "Read query codons and aa"
 #-------------------------------transition/transversion -------------------------------
 #
 df4=df.iloc[:,qindexes].join(df.refbase)
@@ -374,7 +374,7 @@ for i,v in enumerate(snp_nb2):
         ts_tv.append('/'.join(ts))
 df.drop(['query_codon','query_aa','transition/transversion','syn/nsyn/intergenic'],axis=1,inplace=True)
 df.insert(df.columns.size,'transition/transversion',ts_tv)
-print "Read transition/transversion"
+#print "Read transition/transversion"
 
 
 cod.set_index(['molecule','refpos'],inplace=True)
