@@ -439,7 +439,7 @@ for i,v in enumerate(snp_nb):
         query_codon.append('nan')
     else:
         #positions on -1 strand need to be inverted use invert_nucl function
-        if tb.strand.astype(int)[i]==1:
+        if tb.strand[i]=='1':
             ts=list()
             if len(v)==1 and v[0]!='No Hit':
                 query_codon.append(missing_char(str(ref_codon[i]),pos1[i],v[0]))
