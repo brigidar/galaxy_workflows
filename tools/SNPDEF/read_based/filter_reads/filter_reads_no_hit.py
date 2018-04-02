@@ -351,7 +351,7 @@ else:
             query_codon.append('nan')
         else:
             #positions on -1 strand need to be inverted use invert_nucl function
-            if cod['strand'][i]==1:
+            if int(cod['strand'][i])==1:
                 ts=list()
                 if len(v)==1 and v!='N':
                     query_codon.append(missing_char(str(ref_codon[i]),pos1[i],v[0]))
