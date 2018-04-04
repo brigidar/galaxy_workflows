@@ -2,7 +2,7 @@
 #########################################################################################
 #											#
 # Name	      :	vcf_snp_output.py								#
-# Version     : 0.5							#
+# Version     : 0.6						#
 # Project     : snp verify reads						#
 # Description : Script to populate SNPs identified from reads with location information		#
 # Author      : Brigida Rusconi								#
@@ -72,15 +72,17 @@ def get_ref_codon(pos_in_gene,seq):
 def get_snp(table):
     snp_n=[]
     ident=[]
+    ind=[]
     for i,item in enumerate(table.index):
         #only append snp
         snp_u=[n for n in unique(table.iloc[i,:])[:] if n!=table.refbase[i]]
         if len(snp_u)>0:
             snp_n.append(snp_u)
+            ind.append(item)
         else:
             snp_n.append([n for n in unique(table.iloc[i,:])[:]])
-            ident.append(i)
-    return snp_n, ident
+            ident.append(item)
+    return snp_n, ident, ind
 #-----------------------------------------------------------------------------------------
 bases=['A','C','G','T']
 def get_trans_state(base, hit):
@@ -273,7 +275,7 @@ gblist=parse_genbank_file_list(genbank)
 
 df1['refpos']=df1['refpos'].astype(int)
 df1['refpos_norm']=df1['refpos']-1
-
+df1.sort_values(by=['molecule','refpos'],inplace=True,axis=0)
 pl=df1.groupby('molecule')['refpos_norm']
 
 seqen=dict()
@@ -413,28 +415,42 @@ duplicates=table1[~table1.index.isin(tb.index)]
 #print(('%s SNPs are located in more than one gene') % duplicates.index.size)
 #---------------get query codon & aa-------------------------------------------
 
-#get alleles to identify query codon and amino acid
+#position in codon and refcodon
+def mod(x):
+    t= x % 3
+    #last position in codon becomes 3 instead of 0
+    if t==0:
+        t=3
+    #move back to 0-2 range to modify string in codon
+    return t-1
+
+tb.sort_values(by=['molecule','refpos'],inplace=True)
 tb.set_index(['molecule','refpos'],inplace=True)
+tb.pos1=tb.pos_in_gene.astype(int).apply(mod)
+pos1=tb.pos1.tolist()
+ind2=tb.index.tolist()
+#pos1=[ x if x!=0 else 3 for x in pos1 ]
+#pos1=[(x-1) for x in pos1]
+ref_codon=tb.ref_codon.astype(str).tolist()
+#get nucleotides in non duplicated genes
 df1.set_index(['molecule','refpos'],inplace=True)
 coding=df1[df1.index.isin(tb.index)]
-coding.reset_index(inplace=True)
+coding.drop(['refpos_norm'],inplace=True,axis=1)
+
+#coding.reset_index(inplace=True)
 
 # get query base information
-df3=coding.iloc[:,qindexes].join(coding.refbase)
-#position in codon
-pos1=(tb.pos_in_gene.astype(int) % 3).tolist()
-pos1=[ x if x!=0 else 3 for x in pos1 ]
-pos1=[(x-1) for x in pos1]
-ref_codon=tb.ref_codon.astype(str).tolist()
+#df3=coding.iloc[:,qindexes].join(coding.refbase)
+
 #get allele for each position
-snp_nb, idn =get_snp(df3)
+snp_nb, ident1,ind =get_snp(coding)
 
 
 
 
 query_codon=[]
 for i,v in enumerate(snp_nb):
-
+    
     if ref_codon[i]=='nan':
         query_codon.append('nan')
     else:
@@ -480,13 +496,11 @@ tb.insert(tb.columns.size,'query_aa',query_aa)
 
 #print("Read query codons and aa")
 #-------------------------------transition/transversion -------------------------------
-df1.reset_index(inplace=True)
+
 #df1.sort_values(['molecule','refpos'],inplace=True)
-#
-df4=df1.iloc[:,qindexes].join(df1.refbase)
+df1.drop(['refpos_norm'],inplace=True,axis=1)
 
-
-snp_nb2, ident=get_snp(df4)
+snp_nb2, ident2, ind=get_snp(df1)
 ts_tv=[]
 for i,v in enumerate(snp_nb2):
     ts=[]
@@ -497,15 +511,13 @@ for i,v in enumerate(snp_nb2):
             if n!='No Hit':
                      ts.append(get_trans_state(df1.refbase[i],n))
         ts_tv.append('/'.join(ts))
+
 df1.insert(df1.columns.size,'transition/transversion',ts_tv)
 #print("Read transition/transversion")
-df1.drop('refpos_norm',axis=1,inplace=True)
 del(table1)
 del(table2)
-del(df3)
-del(df4)
-
-df1.set_index(['molecule','refpos'],inplace=True)
+#del(df3)
+#del(df4)
 
 fin=df1.join(tb)
 # -------------------------------synonymous nonsynonymous-------------------------------
@@ -534,7 +546,6 @@ for i,item in enumerate(query_aa):
            syn.append('NSYN')
 
 fin.insert(0,'syn?',syn)
-
 #genes that are not CDS are tagged as genic
 genic=dict()
 genic['No CDS']='genic'
@@ -544,8 +555,7 @@ fin.replace({'syn?':genic},inplace=True)
 fin.reset_index(inplace=True)
 
 #SNPs that are actually identical are replaced with No SNP
-fin['syn?'][ident]='No SNP'
-
+fin['syn?'][ident2]='No SNP'
 #-------------------------------dn/ds-------------------------------
 dn=fin.groupby(['gene_name','syn?']).size().reset_index()
 dn_2=dn[dn['syn?'].str.contains('SYN')]
