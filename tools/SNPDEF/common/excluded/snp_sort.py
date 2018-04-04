@@ -42,7 +42,7 @@ class SNPTable:
         self.read_table_file(table_file)
         if not exclude_file is None:
             self.read_exclude_file(exclude_file)
-        print "Filtering %d snps" % (len(self.snps))
+        #print "Filtering %d snps" % (len(self.snps))
         
         self.filtered_snps = []
         
@@ -53,7 +53,7 @@ class SNPTable:
                 self.filtered_snps.append(snp)
         
         
-        print "Sorting %d snps" % (len(self.filtered_snps))
+        #print "Sorting %d snps" % (len(self.filtered_snps))
         
         self.filtered_snps.sort(key=lambda x: x.pos)
         
@@ -133,7 +133,7 @@ class SNPTable:
                 
                 output_handle.write(fs.line)
         
-                print "Done writing the output to %s" % out_file
+                #print "Done writing the output to %s" % out_file
 
 #-------------------------------------------------------------------------------
 #
@@ -160,7 +160,7 @@ def __main__():
     #pdb.set_trace()
     snp_table = SNPTable(table_file=args.snp_table,out_file=args.out,exclude_file=args.exclude_file)
     
-    print "Done filtering %s to %s" % (args.snp_table, args.out)
+    #print "Done filtering %s to %s" % (args.snp_table, args.out)
 
 
 #-------------------------------------------------------------------------------

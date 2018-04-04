@@ -37,7 +37,7 @@ def getSeqRecords(seqList):
         SeqRecords = list(SeqIO.parse(handle, "genbank"))  # Creates a list of SeqRecord objects from genbank files e.
         handle.close()  # Closes handle since it is no longer needed.
     except IOError:
-        print("Failed to connect to NCBI server. ")
+        #print("Failed to connect to NCBI server. ")
         sys.exit(1)
     return SeqRecords
 #-------------------------------------------------

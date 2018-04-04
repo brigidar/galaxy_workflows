@@ -123,7 +123,7 @@ def compute_snp(sd):
     try:
         return SNP(sd[0], sd[1], sd[2], sd[3], sd[4], sd[5], sd[6], sd[7])
     except Exception, e:
-        print "Unable to create a snp entry for molecule '%s' at snp position %d: %s" % (sd[0], sd[1], e)
+        #print "Unable to create a snp entry for molecule '%s' at snp position %d: %s" % (sd[0], sd[1], e)
         #logger.exception("Unable to create a snp entry for molecule '%s' at snp position %d: %s" % (sd[0], sd[1], e))
         raise Exception(e)
 
@@ -198,7 +198,7 @@ class SNP:
                 try:
                     self.molecule_parts.append( mp.split('.')[0] )
                 except Exception,e:
-                    print "Error taking prefix from dot in molecule identifier %s: %s" % (mp,e)
+                    #print "Error taking prefix from dot in molecule identifier %s: %s" % (mp,e)
 
         # Here's the whole thing to check for a match using only the 'in' operator.
         self.molecule_parts.append(molecule)
@@ -576,7 +576,7 @@ class SNP:
                 try:
                     molecule_id_parts.append( mip.split('.')[0] )
                 except Exception:
-                    print "Error getting '.' prefix from locus tag %s in molecule id %s" % (mip,molcule_id) 
+                    #print "Error getting '.' prefix from locus tag %s in molecule id %s" % (mip,molcule_id) 
 
                     gbhits = [g for g in genbank_recs if g.name in molecule_id_parts or g.id in molecule_id_parts]
 
@@ -742,7 +742,7 @@ class QueryEntry:
             if pos < self.flanking_bases:
                 
                 # this is just a message to notify the user about a nucleotide close to the beginning.
-                print "SNP %s is near the beginning of the genome, at offset %d" % (self.snp.tag, offset)
+                #print "SNP %s is near the beginning of the genome, at offset %d" % (self.snp.tag, offset)
                 
 
             try:
@@ -798,7 +798,7 @@ class QueryEntry:
                 
             except Exception, e:
 
-                print "Can't get base for query '%s' from blast '%s:%s' with seq length '%d'and offset '%s': %s" % (self.name, bh.query_id, bh.hit_id, len(bh.hit.seq),offset, e)
+                #print "Can't get base for query '%s' from blast '%s:%s' with seq length '%d'and offset '%s': %s" % (self.name, bh.query_id, bh.hit_id, len(bh.hit.seq),offset, e)
 
         
     #-------------------------------------------------------------------------------
@@ -897,7 +897,7 @@ class ContigFile:
 
             self.contig_records.append(f)
 
-        print "Parsed query FASTA file: %s with %d fasta records" % (filename, len(self.contig_records))
+        #print "Parsed query FASTA file: %s with %d fasta records" % (filename, len(self.contig_records))
 
 
 #*********************************************************************************
@@ -1110,11 +1110,11 @@ class SNPVerify:
 
         self.flanking_bases = int(flanking_bases)
 
-        print "Using flanking base %d" % self.flanking_bases
+        #print "Using flanking base %d" % self.flanking_bases
 
         self.amino_table = int(amino_table)
 
-        print "Using amino table %d" % self.amino_table
+        #print "Using amino table %d" % self.amino_table
         
         self.merged_table = []
         self.genbank_refs = []
@@ -1122,7 +1122,7 @@ class SNPVerify:
         self.snps_per_gene = {}
         self.syn_nsyn_per_gene = {}
 
-        # This holds the entire table before printing it out
+        # This holds the entire table before #printing it out
         self.verified_snps = []
 
 
@@ -1145,7 +1145,7 @@ class SNPVerify:
             self.blast_threshold = 0.0
 
         if self.blast_threshold > 0.0:
-            print "Using blast bitscore threshold of %d" % self.blast_threshold
+            #print "Using blast bitscore threshold of %d" % self.blast_threshold
 
 
         self.blast_length_threshold = blast_length_threshold
@@ -1153,7 +1153,7 @@ class SNPVerify:
         if blast_length_threshold < 0 or blast_length_threshold > (self.flanking_bases*2 + 1):
             self.blast_length_threshold = (self.flanking_bases*2 + 1)
         
-        print "Using blast length threshold %d" % self.blast_length_threshold
+        #print "Using blast length threshold %d" % self.blast_length_threshold
 
 
         #-- just some book keeping to see how many hits are filtered --
@@ -1168,7 +1168,7 @@ class SNPVerify:
             
         #if not threads is None and threads < 1:
             
-            #print "Invalid value for threads (%d), must be a positive number" % threads
+            ##print "Invalid value for threads (%d), must be a positive number" % threads
             #sys.exit()
 
         #else:
@@ -1283,7 +1283,7 @@ class SNPVerify:
         self.parse_query_genomes()
 
         
-        print "Attempting to buld merged table\n"
+        #print "Attempting to buld merged table\n"
 
         if not self.multiproc is None:
 
@@ -1300,13 +1300,13 @@ class SNPVerify:
             if self.multiproc < 0 or self.multiproc > multiprocessing.cpu_count():
                 self.multiproc = multiprocessing.cpu_count()
             
-            print "Using %d of %d available cpus" % (self.multiproc, multiprocessing.cpu_count())
+            #print "Using %d of %d available cpus" % (self.multiproc, multiprocessing.cpu_count())
 
 
             inputs = []
             for molecule, snp_positions in self.snp_positions.iteritems():
 
-                print "Setting up %d SNP jobs for molecule '%s'" % (len(snp_positions),molecule)
+                #print "Setting up %d SNP jobs for molecule '%s'" % (len(snp_positions),molecule)
 
                 for snp_pos in snp_positions:
                 
@@ -1315,16 +1315,16 @@ class SNPVerify:
                                        self.flanking_bases, self.blast_threshold, self.blast_length_threshold))
 
 
-            print "Running %d individual input jobs for processing on %d processes..." % (len(inputs), self.multiproc)
+            #print "Running %d individual input jobs for processing on %d processes..." % (len(inputs), self.multiproc)
             
 
-            print "Running multiprocessing mode..."
+            #print "Running multiprocessing mode..."
             pool = multiprocessing.Pool(self.multiproc)
             pool_output = pool.map(compute_snp, inputs)
             pool.close()
             pool.join()
             
-            print "Collecting results..."
+            #print "Collecting results..."
 
             # clearing out this memory
             inputs = None
@@ -1338,13 +1338,13 @@ class SNPVerify:
             # this uses a threadpool to compute the jobs
             #--------------------------------------------------------
             
-            #print "Using %d threads" % self.threads
+            ##print "Using %d threads" % self.threads
 
             inputs = []
 
             for molecule, snp_positions in self.snp_positions.iteritems():
 
-                print "Setting up %d SNP jobs for molecule '%s'" % (len(snp_positions),molecule)
+                #print "Setting up %d SNP jobs for molecule '%s'" % (len(snp_positions),molecule)
 
                 for snp_pos in snp_positions:
                 
@@ -1355,17 +1355,17 @@ class SNPVerify:
 
             if self.threads < 0:
 
-                print "Value of less than zero (%d) in threads, calculating to use 30%% of %d SNPs" % (self.threads,len(inputs))
+                #print "Value of less than zero (%d) in threads, calculating to use 30%% of %d SNPs" % (self.threads,len(inputs))
                 self.threads = len(inputs)/3
                 
-            print "Running %d individual input jobs for processing on %d threads..." % (len(inputs), self.threads)
+            #print "Running %d individual input jobs for processing on %d threads..." % (len(inputs), self.threads)
 
             pool = ThreadPool(self.threads)
             pool_output = pool.map(compute_snp, inputs)
             pool.close()
             pool.join()
             
-            print "Collecting results..."
+            #print "Collecting results..."
 
             # clearing out this memory
             inputs = None
@@ -1377,7 +1377,7 @@ class SNPVerify:
 
             for molecule, snp_positions in self.snp_positions.iteritems():
 
-                print "Checking %d SNP positions for '%s'" % (len(snp_positions),molecule)
+                #print "Checking %d SNP positions for '%s'" % (len(snp_positions),molecule)
 
                 for snp_pos in snp_positions:
                 
@@ -1390,7 +1390,7 @@ class SNPVerify:
                         
                     except Exception ,e:
 
-                        print "Unable to create a snp entry for molecule '%s' at snp position %d: %s" % (molecule, snp_pos, e)
+                        #print "Unable to create a snp entry for molecule '%s' at snp position %d: %s" % (molecule, snp_pos, e)
                         continue
 
         #- End else clause ------------------------------------------------------------------
@@ -1400,7 +1400,7 @@ class SNPVerify:
         # here we count up the snps per gene and the syn/nsyn per gene. 
         # 
         #-------------------------------------------------------------------------------------
-        print "\nCounting the snps per gene for %d snps\n" % len(self.verified_snps)
+        #print "\nCounting the snps per gene for %d snps\n" % len(self.verified_snps)
 
         for s in self.verified_snps:
 
@@ -1422,7 +1422,7 @@ class SNPVerify:
         # here we write all of the snps and queries to the table
         outfile = open(output_file, 'w')
 
-        print "Writing merged table to '%s'" % output_file
+        #print "Writing merged table to '%s'" % output_file
 
         outfile.write(self.table_header()+"\n")
 
@@ -1607,20 +1607,20 @@ class SNPVerify:
         num_gens = 0
         genbank_files = []
 
-        print "Loading Genbank files"
+        #print "Loading Genbank files"
         
         if not self.genbank_list_file is None:
 
             g_files = self.parse_list_file(self.genbank_list_file)
             
-            print "\tGot %d Genbank files from list file '%s'" % (len(g_files), self.genbank_list_file)
+            #print "\tGot %d Genbank files from list file '%s'" % (len(g_files), self.genbank_list_file)
 
             genbank_files += g_files
             
 
         if not self.genbank_list is None:
 
-            print "\tGot %d Genbank files from the command line" % len(self.genbank_list)
+            #print "\tGot %d Genbank files from the command line" % len(self.genbank_list)
 
             genbank_files += self.genbank_list
            
@@ -1631,7 +1631,7 @@ class SNPVerify:
             try: 
                 gbdata = self._parse_genbank_file_list(gbf)
             except Exception, e:
-                print "Can't parse genbank file %s: %s" % (gbf, e)
+                #print "Can't parse genbank file %s: %s" % (gbf, e)
                 continue
             
             self.genbank_refs.append(gbdata)
@@ -1651,7 +1651,7 @@ class SNPVerify:
 
         genbank_input_handle.close()
 
-        print "Read in %i genbank records from file %s" % (num_gb_recs, genbank_file)
+        #print "Read in %i genbank records from file %s" % (num_gb_recs, genbank_file)
 
         return genbank_recs
 
@@ -1670,7 +1670,7 @@ class SNPVerify:
 
         genbank_input_handle.close()
         genbank_recs
-        print "Read in %i genbank records from file %s" % (num_gb_recs, genbank_file)
+        #print "Read in %i genbank records from file %s" % (num_gb_recs, genbank_file)
 
         return genbank_recs
 
@@ -1687,7 +1687,7 @@ class SNPVerify:
 
         genbank_input_handle.close()
 
-        print "Read in %i genbank records from file %s" % (len(genbank_recs), genbank_file)
+        #print "Read in %i genbank records from file %s" % (len(genbank_recs), genbank_file)
 
         return genbank_recs
 
@@ -1700,20 +1700,20 @@ class SNPVerify:
         num_snp_filess = 0
         snp_panel_files = []
 
-        print "Loading SNP panel files"
+        #print "Loading SNP panel files"
         
         if not self.snp_list_file is None:
 
             s_files = self.parse_list_file(self.snp_list_file)
             
-            print "\tGot %d SNP panel files from list file '%s'" % (len(s_files), self.snp_list_file)
+            #print "\tGot %d SNP panel files from list file '%s'" % (len(s_files), self.snp_list_file)
 
             snp_panel_files += s_files
             
 
         if not self.snp_list is None:
 
-            print "\tGot %d SNP panel files from the command line" % len(self.snp_list)
+            #print "\tGot %d SNP panel files from the command line" % len(self.snp_list)
 
             snp_panel_files += self.snp_list
 
@@ -1727,7 +1727,7 @@ class SNPVerify:
 
             else:
 
-                print "Can't parse '%s', it's not a valid file" % s
+                #print "Can't parse '%s', it's not a valid file" % s
             
         
         for key, value in self.snp_positions.items():
@@ -1735,7 +1735,7 @@ class SNPVerify:
                 self.snp_positions[key].sort()
 
 
-        print "\n"
+        #print "\n"
 
     #-------------------------------------------------------------------------------
     # This does the same as above but returns a bucketed dict 
@@ -1752,7 +1752,7 @@ class SNPVerify:
                     snp_txt = line.split()
 
                     if len(snp_txt) != 2:
-                        print "Error parsing entry \"%s\", not in form 'locus position'" % line
+                        #print "Error parsing entry \"%s\", not in form 'locus position'" % line
                         continue
 
                     else:
@@ -1771,7 +1771,7 @@ class SNPVerify:
                             try:
                                 ref_pos_value = int(snp_txt[1])
                             except Exception, e:
-                                print "Can't add '%s' to locus %s: %s" % (snp_txt[1], snp_txt[0], e)
+                                #print "Can't add '%s' to locus %s: %s" % (snp_txt[1], snp_txt[0], e)
                                 continue
                                     
                             if not ref_pos_value in self.snp_positions[snp_txt[0]]:
@@ -1781,13 +1781,13 @@ class SNPVerify:
 
                             else:
 
-                                print "SNP position %s is already in %s, skipping" % (snp_txt[1], snp_txt[0])
+                                #print "SNP position %s is already in %s, skipping" % (snp_txt[1], snp_txt[0])
                     
                     num_snps += 1
 
             
         
-        print "Parsed %d snp positions from file '%s'" % (num_snps,snp_file)
+        #print "Parsed %d snp positions from file '%s'" % (num_snps,snp_file)
 
     #-------------------------------------------------------------------------------
     # Using some example code I found from this tutorial
@@ -1804,25 +1804,25 @@ class SNPVerify:
 
         blast_files = []
 
-        print "Loading BLAST result files"
+        #print "Loading BLAST result files"
         
         if not self.blast_list_file is None:
 
             b_files = self.parse_list_file(self.blast_list_file)
             
-            print "\tGot %d BLAST result files from list file '%s'" % (len(b_files), self.blast_list_file)
+            #print "\tGot %d BLAST result files from list file '%s'" % (len(b_files), self.blast_list_file)
 
             blast_files += b_files
             
 
         if not self.blast_list is None:
 
-            print "\tGot %d BLAST result files from the command line" % len(self.blast_list)
+            #print "\tGot %d BLAST result files from the command line" % len(self.blast_list)
 
             blast_files += self.blast_list
 
 
-        print "Parsing %d BLAST result files" % len(blast_files)
+        #print "Parsing %d BLAST result files" % len(blast_files)
 
 
         for blast_file in blast_files:
@@ -1836,7 +1836,7 @@ class SNPVerify:
                     blast_rec = self._parse_blast_dict(filename) # loads this as a list of lists
                 except Exception, e:
 
-                    print "Can't parse '%s': %s" % (filename, e)
+                    #print "Can't parse '%s': %s" % (filename, e)
                     read_successful = False
                     continue
 
@@ -1844,22 +1844,22 @@ class SNPVerify:
                 # is successful.
                 if read_successful:
 
-                    print "Parsed BLAST result file: %s" % filename
+                    #print "Parsed BLAST result file: %s" % filename
                     
                     num_blast_files += 1
 
             else:
 
-                print "Can't parse BLAST result file '%s', not a valid file" % filename
+                #print "Can't parse BLAST result file '%s', not a valid file" % filename
 
 
-        print "Parsed %d BLAST result files\n" % num_blast_files
+        #print "Parsed %d BLAST result files\n" % num_blast_files
 
         if self.blast_threshold > 0.0:
 
             num_hits_filtered = self.num_blast_hits_loaded - self.num_filtered_blast_hits
             
-            print "Filtered out %d blast hits of %d total with %f threshold\n" % (num_hits_filtered, self.num_blast_hits_loaded, self.blast_threshold)
+            #print "Filtered out %d blast hits of %d total with %f threshold\n" % (num_hits_filtered, self.num_blast_hits_loaded, self.blast_threshold)
 
     #-------------------------------------------------------------------------------
 
@@ -1893,32 +1893,32 @@ class SNPVerify:
         query_contig_files = []
 
 
-        print "Loading query contig FASTA files"
+        #print "Loading query contig FASTA files"
         
         if not self.query_contig_list_file is None:
 
             qc_files = self.parse_list_file(self.query_contig_list_file)
             
-            print "\tGot %d query contig genome files from list file '%s'" % (len(qc_files), self.query_contig_list_file)
+            #print "\tGot %d query contig genome files from list file '%s'" % (len(qc_files), self.query_contig_list_file)
 
             query_contig_files += qc_files
             
 
         if not self.query_contig_list is None:
 
-            print "\tGot %d query contig genome files from the command line" % len(self.query_contig_list)
+            #print "\tGot %d query contig genome files from the command line" % len(self.query_contig_list)
 
             query_contig_files += self.query_contig_list
 
 
-        print "Parsing %d query contig genome files" % len(query_contig_files)
+        #print "Parsing %d query contig genome files" % len(query_contig_files)
 
         # loop through each file and load them
         for qc_file in query_contig_files:
 
             self.contigs.append( ContigFile(qc_file) )
 
-        print "Parsed %d query contig genome files\n" % len(self.contigs)
+        #print "Parsed %d query contig genome files\n" % len(self.contigs)
 
 
 #-------------------------------------------------------------------------------
@@ -2031,31 +2031,31 @@ def __main__():
 
     if args.blast_list_file is None and args.blast is None:
 
-        parser.print_usage()
-        print "You need at least a blast list file containing a listing with one blast file per line with the -b option, or to have at least one blast file listed with the -w option."
-        print "\n"
+        parser.#print_usage()
+        #print "You need at least a blast list file containing a listing with one blast file per line with the -b option, or to have at least one blast file listed with the -w option."
+        #print "\n"
         
         sys.exit()
 
     if args.genbank_list_file is None and args.genbank is None:
 
-        parser.print_usage()
-        print "You need at least a genbank list file containing a listing with one genbank file per line with the -r option, or to have at least one genbank file listed with the -x option."
-        print "\n"
+        parser.#print_usage()
+        #print "You need at least a genbank list file containing a listing with one genbank file per line with the -r option, or to have at least one genbank file listed with the -x option."
+        #print "\n"
         sys.exit()
 
     if args.query_list_file is None and args.query is None:
 
-        parser.print_usage()
-        print "You need at least a query list file containing a listing with one query contig fasta file per line with the -q option, or to have at least one query contig fasta file listed with the -z option."
-        print "\n"
+        parser.#print_usage()
+        #print "You need at least a query list file containing a listing with one query contig fasta file per line with the -q option, or to have at least one query contig fasta file listed with the -z option."
+        #print "\n"
         sys.exit()
 
     if args.snp_panel_list_file is None and args.snp_panel is None:
 
-        parser.print_usage()
-        print "You need at least a SNP panel list file containing a listing with one SNP panel file per line with the -s option, or to have at least one SNP panel file listed with the -y option."
-        print "\n"
+        parser.#print_usage()
+        #print "You need at least a SNP panel list file containing a listing with one SNP panel file per line with the -s option, or to have at least one SNP panel file listed with the -y option."
+        #print "\n"
         sys.exit()
 
 
@@ -2087,9 +2087,9 @@ def __main__():
     hours, mins = divmod(mins, 60)
     days, hours = divmod(hours, 24)
 
-    print "Execution time was: %dD:%02dH:%02dM:%02dS" % (days, hours, mins, secs)
+    #print "Execution time was: %dD:%02dH:%02dM:%02dS" % (days, hours, mins, secs)
 
-    print "Done!"
+    #print "Done!"
 
 #-------------------------------------------------------------------------------
 if __name__=="__main__": __main__()

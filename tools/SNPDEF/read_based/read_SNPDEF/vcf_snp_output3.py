@@ -49,7 +49,7 @@ def parse_genbank_file_list(genbank_file):
 
     genbank_input_handle.close()
     
-    print "Read in %i genbank records from file %s" % (len(genbank_recs), genbank_file)
+#print("Read in %i genbank records from file %s" % (len(genbank_recs), genbank_file))
     
     return genbank_recs
 
@@ -205,7 +205,7 @@ for i,d in enumerate(data):
         df1.insert(df1.columns.size,name,filler)
 
 df1.drop('s',axis=1,inplace=True)
-print "Read vcf files"
+#print("Read vcf files")
 
 for i,f in enumerate(df1['molecule']):
     try:
@@ -319,7 +319,7 @@ for n,g in pl:
                             #get sequence and gene_name
                             seqen[feature.qualifiers['locus_tag'][0]]=location.extract(gb.seq)
                             tag=repeat(feature.qualifiers['locus_tag'][0],pr.size).tolist()
-                    
+
                             if feature.strand==1:
                                 #get start stop and strand
                                 st2[feature.qualifiers['locus_tag'][0]]=location.start.position
@@ -377,7 +377,7 @@ snps_gene2=dict(zip(snps_gene['gene_name'].tolist(),snps_gene[0].tolist()))
 table1['snps_per_gene']=table1['gene_name'].map(snps_gene2)
 table1['snps/gene_length']=table1['snps_per_gene'].astype(float)/table1['gene_length'].astype(float)
 table1['refpos']=table1['refpos_norm']+1
-print " Read gene information"
+#print(" Read gene information")
 
 
 # --------------------reference codon & aa------------------------------
@@ -399,7 +399,7 @@ for i in range(0,table2.index.size):
 
 table2.insert(table2.columns.size,'ref_codon',ref_codon)
 table2.insert(table2.columns.size,'ref_aa',ref_aa)
-print "Read ref codon and aa"
+#print("Read ref codon and aa")
 
 
 
@@ -410,7 +410,7 @@ tb=fl2.drop_duplicates(subset=['molecule','refpos'])
 
 duplicates=table1[~table1.index.isin(tb.index)]
 
-print('%s SNPs are located in more than one gene') % duplicates.index.size
+#print(('%s SNPs are located in more than one gene') % duplicates.index.size)
 #---------------get query codon & aa-------------------------------------------
 
 #get alleles to identify query codon and amino acid
@@ -434,11 +434,12 @@ snp_nb, idn =get_snp(df3)
 
 query_codon=[]
 for i,v in enumerate(snp_nb):
+
     if ref_codon[i]=='nan':
         query_codon.append('nan')
     else:
         #positions on -1 strand need to be inverted use invert_nucl function
-        if tb['strand'][i]==1:
+        if tb.strand[i]=='1':
             ts=list()
             if len(v)==1 and v[0]!='No Hit':
                 query_codon.append(missing_char(str(ref_codon[i]),pos1[i],v[0]))
@@ -458,6 +459,8 @@ for i,v in enumerate(snp_nb):
                     if n!='No Hit':
                         ts.append(missing_char(str(ref_codon[i]),pos1[i],invert_nucl(n[0])))
                 query_codon.append('/'.join(ts))
+
+#pdb.set_trace()
 query_aa=[]
 for i,v in enumerate(query_codon):
     qq=[]
@@ -475,7 +478,7 @@ for i,v in enumerate(query_codon):
 tb.insert(tb.columns.size,'query_codon',query_codon)
 tb.insert(tb.columns.size,'query_aa',query_aa)
 
-print "Read query codons and aa"
+#print("Read query codons and aa")
 #-------------------------------transition/transversion -------------------------------
 df1.reset_index(inplace=True)
 #df1.sort_values(['molecule','refpos'],inplace=True)
@@ -495,7 +498,7 @@ for i,v in enumerate(snp_nb2):
                      ts.append(get_trans_state(df1.refbase[i],n))
         ts_tv.append('/'.join(ts))
 df1.insert(df1.columns.size,'transition/transversion',ts_tv)
-print "Read transition/transversion"
+#print("Read transition/transversion")
 df1.drop('refpos_norm',axis=1,inplace=True)
 del(table1)
 del(table2)

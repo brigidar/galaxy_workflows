@@ -161,11 +161,11 @@ for i, v in enumerate(count_qbase):
     if 'qbase:' in v:
         qindexes.append(i)
 
-print "Initial SNP count " + str(df.index.size)
+#print "Initial SNP count " + str(df.index.size)
 
 if no_h=="Yes":
     df=df.replace({'No Hit':'N'},regex=True)
-    print "%s have only No Hits and were replaced with N" % (" ".join(setdiff1d(col_start,col_after).tolist()))
+#print "%s have only No Hits and were replaced with N" % (" ".join(setdiff1d(col_start,col_after).tolist()))
 #replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
 else:
     ex=df
@@ -173,11 +173,11 @@ else:
     ex=ex.replace({'No Hit':'ZX'},regex=True)
     exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('ZX', case=False).any(), axis=1)]
     df=df[~df.index.isin(exclude.index)]
-    print "%s have only No Hits and were removed" % (" ".join(setdiff1d(col_start,col_after).tolist()))
+#print "%s have only No Hits and were removed" % (" ".join(setdiff1d(col_start,col_after).tolist()))
 
 
 
-print "Missing SNP removed: SNP left " + str(df.index.size)
+#print "Missing SNP removed: SNP left " + str(df.index.size)
 
 
 bases=['A','C','G','T','N']
@@ -193,7 +193,7 @@ cols=df1.columns
 if remove=="True":
     df3=df1[~df1[cols].isin(bases).all(axis=1)].dropna(how='all')
     df1=df1[~df1.index.isin(df3.index)]
-    print "Non-canonical SNP removed: SNP left " + str( df1.index.size)
+    #print "Non-canonical SNP removed: SNP left " + str( df1.index.size)
     
     for i in bases:
         id=df1
@@ -209,7 +209,7 @@ else:
         df1=df1[df1.index.isin(id.index)]
 
 
-print "Identical positions removed: SNP left " + str( df1.index.size)
+#print "Identical positions removed: SNP left " + str( df1.index.size)
 
 
 removed1=df1.T
@@ -390,7 +390,7 @@ else:
     cod.insert(cod.columns.size,'query_codon',query_codon)
     cod.insert(cod.columns.size,'query_aa',query_aa)
 
-    print "Read query codons and aa"
+#print "Read query codons and aa"
     #-------------------------------transition/transversion -------------------------------
     #
     df4=df.iloc[:,qindexes].join(df.refbase)
@@ -409,7 +409,7 @@ else:
             ts_tv.append('/'.join(ts))
     df.drop(['query_codon','query_aa','transition/transversion','syn?'],axis=1,inplace=True)
     df.insert(df.columns.size,'transition/transversion',ts_tv)
-    print "Read transition/transversion"
+#print "Read transition/transversion"
 
 
     cod.set_index(['molecule','refpos'],inplace=True)

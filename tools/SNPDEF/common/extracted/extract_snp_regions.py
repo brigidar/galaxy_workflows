@@ -38,7 +38,7 @@ def parse_snp_positions(snp_file):
                 lines.append( line.split() )
                 num_snps += 1
 
-    print "Parsed %d snp positions" % num_snps
+##print "Parsed %d snp positions" % num_snps
 
     return lines
 
@@ -60,7 +60,7 @@ def parse_snp_positions_dict(snp_file):
                 snp_txt = line.split()
 
                 if len(snp_txt) != 2:
-                    print "Error parsing entry \"%s\", not in form 'locus position'" % line
+                    ##print "Error parsing entry \"%s\", not in form 'locus position'" % line
                     next
 
                 else:
@@ -68,7 +68,7 @@ def parse_snp_positions_dict(snp_file):
                     try:
                         snp_pos = int(snp_txt[1])
                     except ValueError:
-                        print "Can't parse SNP position %s %s, position isn't a valid value" % (snp_txt[0], snp_txt[1])
+                        ##print "Can't parse SNP position %s %s, position isn't a valid value" % (snp_txt[0], snp_txt[1])
                         continue
 
                     
@@ -84,7 +84,7 @@ def parse_snp_positions_dict(snp_file):
 
                         else:
 
-                            print "SNP position %s is already in %s, skipping" % (snp_txt[1], snp_txt[0])
+                            #print "SNP position %s is already in %s, skipping" % (snp_txt[1], snp_txt[0])
                     
                 num_snps += 1
 
@@ -92,7 +92,7 @@ def parse_snp_positions_dict(snp_file):
 
         snps[key].sort()
 
-    print "Parsed %d snp positions" % num_snps
+    #print "Parsed %d snp positions" % num_snps
 
     return snps
 
@@ -119,7 +119,7 @@ def get_gbank_hits(genbank_recs,molecule_id):
             try:
                 molecule_id_parts.append( mip.split('.')[0] )
             except Exception:
-                print "Error getting '.' prefix from locus tag %s in molecule id %s" % (mip,molcule_id) 
+                #print "Error getting '.' prefix from locus tag %s in molecule id %s" % (mip,molcule_id) 
 
     gbhits = [g for g in genbank_recs if g.name in molecule_id_parts or g.id in molecule_id_parts]
 
@@ -156,7 +156,7 @@ def __main__():
 
             genbank_recs.append(gbrec)
 
-    print "Read in %i genbank records" % (len(genbank_recs))
+    #print "Read in %i genbank records" % (len(genbank_recs))
 
 
     
@@ -177,7 +177,7 @@ def __main__():
         gbhits = get_gbank_hits(genbank_recs,molecule_id)
 
         if len(gbhits) == 0:
-            print "Molecule '%s' is not found in genbank file" % molecule_id
+            #print "Molecule '%s' is not found in genbank file" % molecule_id
             continue
 
         
@@ -185,7 +185,7 @@ def __main__():
 
         for gb in gbhits:
 
-            print "Extracting %d SNP positions for molecule '%s' from genbank '%s'" % (len(snp_dict[molecule_id]), molecule_id, gb.description)
+            #print "Extracting %d SNP positions for molecule '%s' from genbank '%s'" % (len(snp_dict[molecule_id]), molecule_id, gb.description)
 
             # we go through all of our positions for each genbank molecule hit.
             for pos in snp_dict[molecule_id]:
@@ -229,10 +229,10 @@ def __main__():
 
 
                     if status == 1:
-                        print "!!!!! Extracted SNP %s is near the end of a sequence and has length %d\n" % ("%s_%s_SUBSEQ" % (molecule_id,pos), len(this_seq))
+                        #print "!!!!! Extracted SNP %s is near the end of a sequence and has length %d\n" % ("%s_%s_SUBSEQ" % (molecule_id,pos), len(this_seq))
 
                     elif status == 2:
-                        print "!!!!! Extracted SNP %s is near the beginning of a sequence and has length %d\n" % ("%s_%s_SUBSEQ" % (molecule_id,pos), len(this_seq))
+                        #print "!!!!! Extracted SNP %s is near the beginning of a sequence and has length %d\n" % ("%s_%s_SUBSEQ" % (molecule_id,pos), len(this_seq))
 
                         
 
@@ -249,7 +249,7 @@ def __main__():
                     
                 except Exception, e:
 
-                    print "!Error retrieving SNP region for '%s' at position %d: %s" % (molecule_id, pos, e)
+                    #print "!Error retrieving SNP region for '%s' at position %d: %s" % (molecule_id, pos, e)
 
 
 
@@ -261,12 +261,12 @@ def __main__():
         if len(extracted_snps) > 0:
         
             count = SeqIO.write(extracted_snps, output_handle, "fasta")
-            print "Wrote out %s extracted snps to '%s'" % (count,output_file)
+            #print "Wrote out %s extracted snps to '%s'" % (count,output_file)
 
         else:
         
             output_handle.write("No hits")
-            print "No hits for snps in the genbank file\n"
+            #print "No hits for snps in the genbank file\n"
 
             
 if __name__=="__main__": __main__()

@@ -110,12 +110,12 @@ if __name__=='__main__':
         output=args.output
     
     except Exception,e:
-        print "Error: %s" % e
+        ##print "Error: %s" % e
         sys.exit(-1)
 
     ## extract gbk records
 
-    print "Filtering on keys: %s" % keys_1
+    #print "Filtering on keys: %s" % keys_1
     lines = gbk_parse(gbkfname,keys_1,n)
 
     with open(output, 'w') as of:
