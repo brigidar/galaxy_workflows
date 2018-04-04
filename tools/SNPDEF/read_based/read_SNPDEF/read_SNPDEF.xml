@@ -1,4 +1,4 @@
-<tool id="read_SNPDEF" name="read_SNPDEF" version="0.2">
+<tool id="read_SNPDEF" name="read_SNPDEF" version="0.3">
     
     <description>Combined SNP panel from read predictions</description>
     
