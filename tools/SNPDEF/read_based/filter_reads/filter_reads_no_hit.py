@@ -3,11 +3,11 @@
 #########################################################################################
 #											#
 # Name	      :	filter_reads.py								#
-# Version     : 0.1									#
+# Version     : 0.2								#
 # Project     : SNPDEF							#
 # Description : Script to sort out no hits and get fasta		#
 # Author      : Brigida Rusconi								#
-# Date        : September 6th, 2016							#
+# Date        : April 4th, 2018							#
 #											#
 #########################################################################################
 #for replacement of a given value with NaN

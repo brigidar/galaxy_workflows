@@ -2,11 +2,11 @@
 #########################################################################################
 #											#
 # Name	      :	vcf_snp_output.py								#
-# Version     : 0.4								#
+# Version     : 0.5							#
 # Project     : snp verify reads						#
 # Description : Script to populate SNPs identified from reads with location information		#
 # Author      : Brigida Rusconi								#
-# Date        : September 13th, 2017						#
+# Date        : April 4th, 2018						#
 #											#
 #########################################################################################
 
