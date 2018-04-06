@@ -2,11 +2,11 @@
 #########################################################################################
 #											#
 # Name	      :	vcf_snp_output.py								#
-# Version     : 0.6						#
+# Version     : 0.7						#
 # Project     : snp verify reads						#
 # Description : Script to populate SNPs identified from reads with location information		#
 # Author      : Brigida Rusconi								#
-# Date        : April 4th, 2018						#
+# Date        : April 6th, 2018						#
 #											#
 #########################################################################################
 
@@ -62,7 +62,6 @@ def get_ref_codon(pos_in_gene,seq):
     
     codon_pos = pos_in_gene - pos_in_codon
     if codon_pos < 0:
-        
         codon_pos = 0
     ref_codon = str(seq[ codon_pos : (codon_pos + 3)])
     return ref_codon
@@ -138,7 +137,7 @@ def invert_nucl(nuc):
     nuc2=nucl_dict[nuc]
     return nuc2
 
-#--------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------
 def flattern(A):
     rt = []
     for i in A:
@@ -146,7 +145,16 @@ def flattern(A):
         else: rt.append(i)
     return rt
 
-#--------------------------------End Functions------------------------------------------------------------
+
+#------------------------------------------------------------------------------------------
+def mod(x):
+    t= x % 3
+    #last position in codon becomes 3 instead of 0
+    if t==0:
+        t=3
+    #move back to 0-2 range to modify string in codon
+    return t-1
+#--------------------------------End Functions---------------------------------------------
 options.mode.chained_assignment = None
 
 #-------------------------------Parse arguments-------------------------------
@@ -163,15 +171,12 @@ genbank=args.genbank
 t_t=int(args.translation_table)
 query=args.query
 names=args.name
-#LOG_FILENAME='read_snp.log'
-#logging.basicConfig(filename=LOG_FILENAME,level=logging.WARNING)
+
 
 # -------------------------------concatenates vcf files-------------------------------
 
 from pandas.io.common import EmptyDataError
 data=[]
-
-
 for f in query:
     try:
         dl=read_csv(f, sep ='\t', header=None, dtype=object)
@@ -186,7 +191,6 @@ for n in names:
 #start reading in vcf as tables
 #https://pandas.pydata.org/pandas-docs/stable/merging.html#concatenating-using-append
 long=[]
-
 for i,d in enumerate(data):
     long.append(d.index.size)
 
@@ -222,15 +226,19 @@ for i,f in enumerate(df1['molecule']):
             df1['molecule'][i]=f.split('.')[0]
     except KeyError:
         continue
+
+#Fill out positions that are not called with No Hit
+df1.fillna('No Hit', inplace=True)
+df1.mask(df1['refbase'].str.len()>1,inplace=True)
+df1.dropna(inplace=True)
+
+
 #qindexes w/o molecule and refpos as indexes!!!
 count_qbase=list(df1.columns.values)
 qindexes=[]
 for i, v in enumerate(count_qbase):
     if 'qbase:' in str(v):
         qindexes.append(i)
-df1.fillna('No Hit', inplace=True)
-df1.mask(df1['refbase'].str.len()>1,inplace=True)
-df1.dropna(inplace=True)
 #check if any complex event are still present, should be obsolete with new freebayes settings
 try:
     comple=df1.iloc[:,qindexes]
@@ -243,8 +251,7 @@ except KeyError:
     pass
 
 
-
-#count snps per genome
+#count snps per genome and write file with snp/genome
 counting=[]
 for i in qindexes:
     b=df1.iloc[:,i].str.contains('\.').sum()
@@ -255,21 +262,18 @@ snp_genome=DataFrame({'genomes':names, 'snps':counting})
 
 with open('snps_per_genome.txt','w') as output3:
     snp_genome.to_csv(output3,index=False,sep='\t')
-#replaces all identical hits with actual nucleotide
+
+#replaces queries identical to reference with actual nucleotide
 for v in df1.index:
-#df1.loc[v]=[df1.refbase[v] for x in df1.loc[v] if x=='.']
     df1.loc[v].replace({'\.':df1.refbase[v]},regex=True,inplace=True)
 
 del(data)
-
-#splits up molecule name to match genbank record
-
+#keeps molecule and refpos only once
 df=df1.drop_duplicates(subset=['molecule','refpos'])
+
 #---------------------read in genbank file features-----------------------------------------------
 
 gblist=parse_genbank_file_list(genbank)
-
-
 
 # exact position in genbank gets normalized. The imported SNPs are not normalized (start @ 0 instead of 1) use refpos_norm instead
 
@@ -279,7 +283,6 @@ df1.sort_values(by=['molecule','refpos'],inplace=True,axis=0)
 pl=df1.groupby('molecule')['refpos_norm']
 
 seqen=dict()
-gen2=[]
 ml=[]
 pos2=[]
 st2=dict()
@@ -302,17 +305,20 @@ for n,g in pl:
                 if  feature.type != "source":
                     location=feature.location
                     g=g.astype(int)
+                    #array of all positions on given chromosome or contig
                     gl=array(g)
-                    #the last number is not included in the actual gene. upper limits are never included they are up to references e.g. [2:3] gives nucleotide in position 2 only
-                    pr=gl[(gl>=(location.start.position))*(gl< location.end.position)]
                     
+                    #the last number is not included in the actual gene. upper limits are never included they are up to references e.g. [2:3] gives nucleotide in position 2 only
+                    if feature.strand==1:
+                        pr=gl[(gl>=(location.start.position))*(gl< location.end.position)]
+                    #because of that when the gene is reversed we have to exclude the start position as it is actually one further than the end and still not include the last position as it is the end of the interval
+                    else:
+                        pr=gl[(gl>(location.start.position))*(gl< location.end.position)]
                     
                     if pr.size>0:
                         sf=[]
                         yt=[]
                         tag=[]
-                        
-                        
                         if feature.type=='gene':
                             #get feature info, gene length, molecule, refpos
                             sf=repeat(feature, pr.size).tolist()
@@ -328,8 +334,8 @@ for n,g in pl:
                                 sp2[feature.qualifiers['locus_tag'][0]]=location.end.position
                                 str2[feature.qualifiers['locus_tag'][0]]='1'
                             else:
-                                sp2[feature.qualifiers['locus_tag'][0]]=location.start.position
-                                st2[feature.qualifiers['locus_tag'][0]]=location.end.position
+                                st2[feature.qualifiers['locus_tag'][0]]=location.end.position-1
+                                sp2[feature.qualifiers['locus_tag'][0]]=location.start.position+1
                                 str2[feature.qualifiers['locus_tag'][0]]='-1'
                             
                             pos.append(pr.tolist())
@@ -340,7 +346,7 @@ for n,g in pl:
                         elif feature.type=='CDS':
                             # make dictionary for product
                             prod[feature.qualifiers['locus_tag'][0]]=''.join(feature.qualifiers['product'])
-    gen2.append(gen)
+
     ml.append(mol)
     pos2.append(pos)
     tag2.append(tag1)
@@ -348,15 +354,10 @@ for n,g in pl:
 
 # flatten list of lists with strings https://stackoverflow.com/questions/17864466/flatten-a-list-of-strings-and-lists-of-strings-and-lists-in-python
 ml=flattern(ml)
-gen2=flattern(gen2)
 pos2=flattern(pos2)
 tag2=flattern(tag2)
 #make table from lists and dictionaries
-info=[ml,pos2,tag2]
-gene_hits=[ml,pos2,gen2]
-table1=DataFrame(info)
-table1=table1.T
-table1.columns=['molecule','refpos_norm','gene_name']
+table1=DataFrame({'molecule':ml,'refpos_norm':pos2,'gene_name':tag2})
 
 #map dictionary to column https://stackoverflow.com/questions/24216425/adding-a-new-pandas-column-with-mapped-value-from-a-dictionary
 table1['gene_start']=table1['gene_name'].map(st2)
@@ -364,15 +365,16 @@ table1['gene_end']=table1['gene_name'].map(sp2)
 table1['gene_length']=table1['gene_name'].map(len2)
 table1['strand']=table1['gene_name'].map(str2)
 table1['product']=table1['gene_name'].map(prod)
+#for fwd genes
 table1['pos_in_gene']=table1['refpos_norm']-table1['gene_start']+1
 table1['product'].fillna('No CDS',inplace=True)
 
-#replace inverted gene position
+#replace position for inverted genes
 for i in table1.index:
     if table1['pos_in_gene'][i]<=0:
-        table1['pos_in_gene'][i]=table1['gene_start'][i]-table1['refpos_norm'][i]
-
-
+        table1['pos_in_gene'][i]=table1['gene_start'][i]-table1['refpos_norm'][i]+1
+#have to add 1 to normalize back to 1-x style, which is how the genbank reports the start and end on NCBI you need the base 1 values to search a region on ncbi.
+table1['gene_start']=table1['gene_start'].add(1)
 ##only genes with SNPs and not identical locations
 snps_gene=table1.groupby('gene_name').size().reset_index()
 snps_gene2=dict(zip(snps_gene['gene_name'].tolist(),snps_gene[0].tolist()))
@@ -415,38 +417,19 @@ duplicates=table1[~table1.index.isin(tb.index)]
 #print(('%s SNPs are located in more than one gene') % duplicates.index.size)
 #---------------get query codon & aa-------------------------------------------
 
-#position in codon and refcodon
-def mod(x):
-    t= x % 3
-    #last position in codon becomes 3 instead of 0
-    if t==0:
-        t=3
-    #move back to 0-2 range to modify string in codon
-    return t-1
-
+df1.drop(['refpos_norm'],inplace=True,axis=1)
 tb.sort_values(by=['molecule','refpos'],inplace=True)
 tb.set_index(['molecule','refpos'],inplace=True)
-tb.pos1=tb.pos_in_gene.astype(int).apply(mod)
+tb['pos1']=tb.pos_in_gene.astype(int).apply(mod)
 pos1=tb.pos1.tolist()
-ind2=tb.index.tolist()
-#pos1=[ x if x!=0 else 3 for x in pos1 ]
-#pos1=[(x-1) for x in pos1]
 ref_codon=tb.ref_codon.astype(str).tolist()
 #get nucleotides in non duplicated genes
 df1.set_index(['molecule','refpos'],inplace=True)
 coding=df1[df1.index.isin(tb.index)]
-coding.drop(['refpos_norm'],inplace=True,axis=1)
 
-#coding.reset_index(inplace=True)
-
-# get query base information
-#df3=coding.iloc[:,qindexes].join(coding.refbase)
 
 #get allele for each position
 snp_nb, ident1,ind =get_snp(coding)
-
-
-
 
 query_codon=[]
 for i,v in enumerate(snp_nb):
@@ -497,8 +480,7 @@ tb.insert(tb.columns.size,'query_aa',query_aa)
 #print("Read query codons and aa")
 #-------------------------------transition/transversion -------------------------------
 
-#df1.sort_values(['molecule','refpos'],inplace=True)
-df1.drop(['refpos_norm'],inplace=True,axis=1)
+
 
 snp_nb2, ident2, ind=get_snp(df1)
 ts_tv=[]
@@ -516,8 +498,7 @@ df1.insert(df1.columns.size,'transition/transversion',ts_tv)
 #print("Read transition/transversion")
 del(table1)
 del(table2)
-#del(df3)
-#del(df4)
+
 
 fin=df1.join(tb)
 # -------------------------------synonymous nonsynonymous-------------------------------
@@ -598,18 +579,15 @@ for i,v in enumerate(dn_2['gene_name']):
             dn_ds[v]=0
 
 fin['dn_ds']=fin['gene_name'].map(dn_ds)
-fin1=fin.iloc[:,1:(max(qindexes)+3)]
-fin1.set_index(['molecule','refpos'],inplace=True)
-fin2=fin.reindex_axis(['molecule','refpos','gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds','strand'],axis=1)#'dn/ds'
-fin2.set_index(['molecule','refpos'],inplace=True)
+fin.set_index(['molecule','refpos'],inplace=True)
+fin1=fin.iloc[:,1:(max(qindexes)+1)]
+fin2=fin.reindex(columns=['gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds','strand'])#'dn/ds'
 final=fin1.join(fin2)
 final.reset_index(inplace=True)
-
-final.sort_values(by=['molecule','refpos'],inplace=True)
+#pdb.set_trace()
 #-------------------------------write file-------------------------------
 with open(output_file,'w') as output2:
     final.to_csv(output2, sep='\t', index=False)
-
 
 
 

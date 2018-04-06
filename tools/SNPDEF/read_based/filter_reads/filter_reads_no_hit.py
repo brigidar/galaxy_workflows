@@ -3,11 +3,11 @@
 #########################################################################################
 #											#
 # Name	      :	filter_reads.py								#
-# Version     : 0.2								#
+# Version     : 0.3								#
 # Project     : SNPDEF							#
 # Description : Script to sort out no hits and get fasta		#
 # Author      : Brigida Rusconi								#
-# Date        : April 4th, 2018							#
+# Date        : April 5th, 2018							#
 #											#
 #########################################################################################
 #for replacement of a given value with NaN
@@ -129,6 +129,7 @@ no_h=args.no_hit
 
 #read in file as dataframe
 df=read_csv(input_file,sep='\t', dtype=object)
+df.refpos=df.refpos.astype(int)
 df=df.set_index(['molecule','refpos'])
 init=df.columns.size
 col_start=df.columns.values
@@ -324,8 +325,9 @@ else:
     df.insert(df.columns.size,'strand',st)
     cod=df.dropna(subset=['gene_name'])
     cod.reset_index(inplace=True)
+    cod.sort_values(by=['molecule','refpos'],inplace=True)
+    cod.set_index(['molecule','refpos'],inplace=True)
     
-
     count_qbase2=list(cod.columns.values)
     qindexes2=[]
     for i, v in enumerate(count_qbase2):
@@ -333,11 +335,23 @@ else:
             qindexes2.append(i)
 
     # get query base information
+    #position in codon and refcodon
+    def mod(x):
+        t= x % 3
+        #last position in codon becomes 3 instead of 0
+        if t==0:
+            t=3
+        #move back to 0-2 range to modify string in codon
+        return t-1
+
     df3=cod.iloc[:,qindexes2].join(cod.refbase)
+    df3.reset_index(inplace=True)
+    df3.sort_values(by=['molecule','refpos'],inplace=True)
+    df3.set_index(['molecule','refpos'],inplace=True)
     #position in codon
-    pos1=(cod.pos_in_gene.astype(int) % 3).tolist()
-    pos1=[ x if x!=0 else 3 for x in pos1 ]
-    pos1=[(x-1) for x in pos1]
+    cod['pos1']=cod.pos_in_gene.astype(int).apply(mod)
+    pos1=cod.pos1.tolist()
+    ind2=cod.index.tolist()
     ref_codon=cod.ref_codon.astype(str).tolist()
     #get allele for each position
 
@@ -412,7 +426,7 @@ else:
 #print "Read transition/transversion"
 
 
-    cod.set_index(['molecule','refpos'],inplace=True)
+
     fin=df.join(cod.loc[:,['query_codon','query_aa']])
     # -------------------------------synonymous nonsynonymous-------------------------------
     query_aa=fin.query_aa.astype(str).tolist()
@@ -496,7 +510,7 @@ else:
     fin['dn_ds']=fin['gene_name'].map(dn_ds)
     fin1=fin.iloc[:,1:(max(qindexes)+4)]
     fin1.set_index(['molecule','refpos'],inplace=True)
-    fin2=fin.reindex_axis(['molecule','refpos','gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds','strand'],axis=1)#'dn/ds'
+    fin2=fin.reindex(columns=['molecule','refpos','gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds','strand'])#'dn/ds'
     fin2.set_index(['molecule','refpos'],inplace=True)
     final=fin1.join(fin2)
     final.reset_index(inplace=True)
