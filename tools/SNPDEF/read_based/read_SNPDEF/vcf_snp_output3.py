@@ -2,11 +2,11 @@
 #########################################################################################
 #											#
 # Name	      :	vcf_snp_output.py								#
-# Version     : 0.7						#
+# Version     : 0.8						#
 # Project     : snp verify reads						#
 # Description : Script to populate SNPs identified from reads with location information		#
 # Author      : Brigida Rusconi								#
-# Date        : April 6th, 2018						#
+# Date        : May 29th, 2018						#
 #											#
 #########################################################################################
 
@@ -232,7 +232,6 @@ df1.fillna('No Hit', inplace=True)
 df1.mask(df1['refbase'].str.len()>1,inplace=True)
 df1.dropna(inplace=True)
 
-
 #qindexes w/o molecule and refpos as indexes!!!
 count_qbase=list(df1.columns.values)
 qindexes=[]
@@ -346,11 +345,17 @@ for n,g in pl:
                         elif feature.type=='CDS':
                             # make dictionary for product
                             prod[feature.qualifiers['locus_tag'][0]]=''.join(feature.qualifiers['product'])
+                        elif feature.type=='tRNA':
+                            # make dictionary for product
+                            prod[feature.qualifiers['locus_tag'][0]]=''.join(feature.qualifiers['product'])
+                        elif feature.type=='rRNA':
+                            prod[feature.qualifiers['locus_tag'][0]]=''.join(feature.qualifiers['product'])
 
     ml.append(mol)
     pos2.append(pos)
     tag2.append(tag1)
 #----------------------------------------------------------
+pdb.set_trace()
 
 # flatten list of lists with strings https://stackoverflow.com/questions/17864466/flatten-a-list-of-strings-and-lists-of-strings-and-lists-in-python
 ml=flattern(ml)
@@ -368,7 +373,6 @@ table1['product']=table1['gene_name'].map(prod)
 #for fwd genes
 table1['pos_in_gene']=table1['refpos_norm']-table1['gene_start']+1
 table1['product'].fillna('No CDS',inplace=True)
-
 #replace position for inverted genes
 for i in table1.index:
     if table1['pos_in_gene'][i]<=0:
