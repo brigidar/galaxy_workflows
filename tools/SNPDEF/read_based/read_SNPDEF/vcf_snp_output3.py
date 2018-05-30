@@ -6,7 +6,7 @@
 # Project     : snp verify reads						#
 # Description : Script to populate SNPs identified from reads with location information		#
 # Author      : Brigida Rusconi								#
-# Date        : May 29th, 2018						#
+# Date        : May 30th, 2018						#
 #											#
 #########################################################################################
 
@@ -355,7 +355,7 @@ for n,g in pl:
     pos2.append(pos)
     tag2.append(tag1)
 #----------------------------------------------------------
-pdb.set_trace()
+
 
 # flatten list of lists with strings https://stackoverflow.com/questions/17864466/flatten-a-list-of-strings-and-lists-of-strings-and-lists-in-python
 ml=flattern(ml)
@@ -363,7 +363,6 @@ pos2=flattern(pos2)
 tag2=flattern(tag2)
 #make table from lists and dictionaries
 table1=DataFrame({'molecule':ml,'refpos_norm':pos2,'gene_name':tag2})
-
 #map dictionary to column https://stackoverflow.com/questions/24216425/adding-a-new-pandas-column-with-mapped-value-from-a-dictionary
 table1['gene_start']=table1['gene_name'].map(st2)
 table1['gene_end']=table1['gene_name'].map(sp2)
@@ -373,6 +372,7 @@ table1['product']=table1['gene_name'].map(prod)
 #for fwd genes
 table1['pos_in_gene']=table1['refpos_norm']-table1['gene_start']+1
 table1['product'].fillna('No CDS',inplace=True)
+
 #replace position for inverted genes
 for i in table1.index:
     if table1['pos_in_gene'][i]<=0:
@@ -386,7 +386,6 @@ table1['snps_per_gene']=table1['gene_name'].map(snps_gene2)
 table1['snps/gene_length']=table1['snps_per_gene'].astype(float)/table1['gene_length'].astype(float)
 table1['refpos']=table1['refpos_norm']+1
 #print(" Read gene information")
-
 
 # --------------------reference codon & aa------------------------------
 #only get reference codon and amino acids for coding genes
@@ -411,7 +410,6 @@ table2.insert(table2.columns.size,'ref_aa',ref_aa)
 
 
 
-
 #SNPs in multiple genes
 fl2=table2.append(genes)
 tb=fl2.drop_duplicates(subset=['molecule','refpos'])
@@ -430,7 +428,6 @@ ref_codon=tb.ref_codon.astype(str).tolist()
 #get nucleotides in non duplicated genes
 df1.set_index(['molecule','refpos'],inplace=True)
 coding=df1[df1.index.isin(tb.index)]
-
 
 #get allele for each position
 snp_nb, ident1,ind =get_snp(coding)
@@ -463,7 +460,6 @@ for i,v in enumerate(snp_nb):
                         ts.append(missing_char(str(ref_codon[i]),pos1[i],invert_nucl(n[0])))
                 query_codon.append('/'.join(ts))
 
-#pdb.set_trace()
 query_aa=[]
 for i,v in enumerate(query_codon):
     qq=[]
@@ -538,15 +534,16 @@ fin.reset_index(inplace=True)
 fin.set_index('product',inplace=True)
 fin.replace({'syn?':genic},inplace=True)
 fin.reset_index(inplace=True)
+fin.set_index(['molecule','refpos'],inplace=True)
 
 #SNPs that are actually identical are replaced with No SNP
 fin['syn?'][ident2]='No SNP'
+fin.reset_index(inplace=True)
 #-------------------------------dn/ds-------------------------------
 dn=fin.groupby(['gene_name','syn?']).size().reset_index()
 dn_2=dn[dn['syn?'].str.contains('SYN')]
 dn_2.rename(columns={0:'count'},inplace=True)
 dn_ds=dict()
-
 for i,v in enumerate(dn_2['gene_name']):
     t=dn_2[dn_2['gene_name']==v]
     if any(t['syn?'].str.contains('/')):
@@ -581,7 +578,6 @@ for i,v in enumerate(dn_2['gene_name']):
             dn_ds[v]=t[t['syn?']=='NSYN']['count'].values[0] / t[t['syn?']=='SYN']['count'].values[0]
         except IndexError:
             dn_ds[v]=0
-
 fin['dn_ds']=fin['gene_name'].map(dn_ds)
 fin.set_index(['molecule','refpos'],inplace=True)
 fin1=fin.iloc[:,1:(max(qindexes)+1)]
