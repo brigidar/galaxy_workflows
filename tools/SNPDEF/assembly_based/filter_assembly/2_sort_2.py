@@ -3,11 +3,11 @@
 #########################################################################################
 #											#
 # Name	      :	2_sort_2.py								#
-# Version     : 0.6									#
+# Version     : 0.7									#
 # Project     : sort & merge SNP tables							#
 # Description : Script to sort out no hits, indels, identical lines and double hits		#
 # Author      : Brigida Rusconi								#
-# Date        : August 4th, 2017							#
+# Date        : May 31st, 2018							#
 #											#
 #########################################################################################
 #for replacement of a given value with NaN
@@ -100,8 +100,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-o', '--output', help="fasta snps")
 parser.add_argument('-s', '--snp_table', help="snp table to sort")
 parser.add_argument('-t', '--total', help="inverted table to look at", default= "snp_filtered_table.txt")
-parser.add_argument('-r','--remove', help="remove non-canonical nucleotides", default= "False")
-parser.add_argument('-n','--no_hit', help="Keep no hits", default= "Yes")
+parser.add_argument('-r','--remove', help="remove non-canonical nucleotides", default= "True")
+
 
 
 args = parser.parse_args()
@@ -109,23 +109,11 @@ output_file = args.output
 input_file = args.snp_table
 output2_file = args.total
 remove=args.remove
-no_h=args.no_hit
+
 #------------------------------------------------------------------------------------------
 #read in file as dataframe
 df =read_csv(input_file,sep='\t', dtype=object)
 df=df.set_index(['molecule','refpos']).fillna('--')
-
-
-#print "merged table number SNPS " + str(df.index.size)
-
-#------------------------------------------------------------------------------------------
-#replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
-if no_h=='No':
-    df=df.mask(df=='No Hit').dropna()
-#print "No Hit removed: SNP left " + str(df.index.size)
-else:
-    df=df.replace({'No Hit':'N'},regex=True)
-#print " No Hits and were replaced with N"
 
 #------------------------------------------------------------------------------------------
 # only columns with qbase and refbase in table
@@ -137,100 +125,86 @@ for i, v in enumerate(count_qbase):
         qindexes.append(i)
 df1=df.iloc[:,qindexes]
 
+#------------------------------------------------------------------------------------------
+#replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
+
+df=df.mask(df=='No Hit').dropna()
+
+#print " No Hits and were replaced with N"
+
 #removes lines that had no hit because alignment was too short
-df1=df1.mask(df1=='--').dropna()
+#df1=df1.mask(df1=='--').dropna()
 ref=df['refbase']
 df=df[df.index.isin(df1.index)]
 
 #------------------------------------------------------------------------------------------
-#multiple hits check for alignment length create dataframe with information
 
+#longest alignment for each position
+mindexes=[]
+for i, v in enumerate(count_qbase):
+    if 'maxlen:' in v:
+        mindexes.append(i)
+df_m=df.iloc[:,mindexes]
+
+
+#multiple hits check for alignment length create dataframe with information
 bindexes=[]
 for i, v in enumerate(count_qbase):
     if 'blengths:' in v:
         bindexes.append(i)
 
 df_l=df.iloc[:,bindexes]
-maxim=[]
-maxpos=[]
+df_l=df_l.replace({'No Hit':'0'},regex=True)
 
-#split on / and find max value
+ind=[]
+#check how many full alignments are present and drop position if more than one.
 for i in range(0, df_l.index.size):
-    maxim2=[]
-    for s in df_l.iloc[i,:]:
-        if '/' in s:
-            for n in s.split('/'):
-                maxim2.append(int(n))
-        else:
-            maxim2.append(int(s))
-    maxim.append(max(maxim2))
-
-# get position of better alignment----------------------------------------------------
-
-for i in range(0, df_l.index.size):
-    maxpos2=[]
-    for s in df_l.iloc[i,:]:
-        if '/' in s:
-            maxpos3=[]
-            for n,m in enumerate(s.split('/')):
-                if int(m)==maxim[i]:
-                    maxpos3.append(n)
-            maxpos2.append(maxpos3)
-        else:
-            maxpos3=['0']
-            maxpos2.append(maxpos3)
-    maxpos.append(maxpos2)
-
-# check back positions with nucleotides----------------------------------------------
-
-df2_r=df1.reset_index(drop=True, level=0)
-
-for i,v in enumerate(maxpos):
-    for a,b in enumerate(v):
-        if '--' in b:
-            df2_r.iloc[i,a]='--'
-        if '/' in df2_r.iloc[i,a]:
-            g=[]
-            m=[]
-            m=df2_r.iloc[i,a].split('/')
-            if len(b)==1:
-                df2_r.iloc[i,a]=m[int(b[0])]
-            elif len(b)==0:
-                df2_r.iloc[i,a]='NaN'
+    #check if there is more than one hit
+    if any(df_l.iloc[i,:].str.contains('/')):
+        ind2=[]
+        for v,x in enumerate(df_l.iloc[i,:]):
+            #if there is more than one hit is it bad quality or good?
+            if '/' in x:
+                #count the number of times that a maximum length alignment is present.
+                if x.split('/').count(df_m.iloc[i,v])!=1:
+                    continue
+                else:
+                    ps=x.split('/').index(df_m.iloc[i,v])
+                    #replace nucleotide with only valid nucleotide
+                    df.iloc[i,v+2]=df.iloc[i,v+2].split('/')[ps]
+                    ind2.append(i)
             else:
-                for c in b:
-                    g.append(m[c])
-                df2_r.iloc[i,a]=str('/'.join(g))
-            
-df2_p=df2_r.set_index(df1.index)
+                ind2.append(i)
+        if len(ind2)!=df_l.columns.size:
+            #if not all positions remain with only one hit remove the location
+            continue
+        else:
+            ind.append(i)
 
-#------------------------------------------------------------------------------------------
-#select remaining rows with duplicates
+    else:
+        ind.append(i)
 
-sl=[]
-for i,v in enumerate(df2_p.index):
-    for n in df2_p.iloc[i,:]:
-        if len(n.split('/'))>1:
-            sl.append(df2_p.index[i])
-
-#------------------------------------------------------------------------------------------
-# remove rows that are in empty
-
-slash=df2_p.drop(sl)
-
-#print "double hits removed: SNP left " + str(slash.index.size)
-slash2=concat([ref,slash], axis=1, join_axes=[slash.index])
+#drop all positions that do not have an unique high quality blast hit.
+df.reset_index(inplace=True)
+df2=df[df.index.isin(ind)]
+#remove blength and maxlength
+df_l.reset_index(inplace=True)
+df_l1=df_l[df_l.index.isin(ind)]
+df2.set_index(['molecule','refpos'],inplace=True)
+df2.drop(df2.columns[bindexes],axis=1,inplace=True)
+f2.drop(df2.columns[mindexes],axis=1,inplace=True)
 
 #------------------------------------------------------------------------------------------
 # remove identical line
 
-bases=['A','C','G','T']
-cols=slash2.columns
+bases=['A','C','G','T','-']
+df3=df2.iloc[:,qindexes].join(df2.iloc[:,1])
+cols=df3.columns
 
 # remove non-canononical snps (optional)
 if remove=="True":
-    slash3=slash2[~slash2[cols].isin(bases).all(axis=1)].dropna(how='all')
-    slash2=slash2[~slash2.index.isin(slash3.index)]
+    slash3=df3[~df3[cols].isin(bases).all(axis=1)].dropna(how='all')
+    df3=df3[~df3.index.isin(slash3.index)]
     for i in bases:
         id=df1
         id=id.replace({'N':i},regex=True)
@@ -295,13 +269,13 @@ df['snps_per_gene']=df['gene_name'].map(snps_gene2)
 df['snps/gene_length']=to_numeric(df['snps_per_gene'],errors='coerce').divide(to_numeric(df['gene_length'],errors='coerce'),axis=0)
 
 
-
+pdb.set_trace()
 #------------------------------------------------------------------------------------------
 cod=df.dropna(subset=['gene_name'])
 cod=cod.mask(cod['gene_name']=='intergenic').dropna()
 cod.reset_index(inplace=True)
 
-
+pdb.set_trace()
 count_qbase2=list(cod.columns.values)
 qindexes2=[]
 for i, v in enumerate(count_qbase2):
@@ -311,9 +285,16 @@ for i, v in enumerate(count_qbase2):
 # get query base information
 df3=cod.iloc[:,qindexes2].join(cod.refbase)
 #position in codon
-pos1=(cod.pos_in_gene.astype(int) % 3).tolist()
-pos1=[ x if x!=0 else 3 for x in pos1 ]
-pos1=[(x-1) for x in pos1]
+def mod(x):
+    t= x % 3
+        #last position in codon becomes 3 instead of 0
+    if t==0:
+        t=3
+    #move back to 0-2 range to modify string in codon
+    return t-1
+
+cod['pos1']=cod.pos_in_gene.astype(int).apply(mod)
+pos1=cod.pos1.tolist()
 ref_codon=cod.ref_codon.astype(str).tolist()
 #get allele for each position
 
@@ -351,7 +332,7 @@ for i,v in enumerate(query_codon):
         else:
             query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
 cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
-
+pdb.set_trace()
 cod.insert(cod.columns.size,'query_codon',query_codon)
 cod.insert(cod.columns.size,'query_aa',query_aa)
 
@@ -413,10 +394,10 @@ fin.reset_index(inplace=True)
 fin.set_index('product',inplace=True)
 fin.replace({'syn?':genic},inplace=True)
 fin.reset_index(inplace=True)
-
+fin.set_index(['molecule','refpos'],inpace=True)
 #SNPs that are actually identical are replaced with No SNP
 fin['syn?'][ident]='No SNP'
-
+fin.reset_index(inplace=True)
 #-------------------------------dn/ds-------------------------------
 dn=fin.groupby(['gene_name','syn?']).size().reset_index()
 dn_2=dn[dn['syn?'].str.contains('SYN')]

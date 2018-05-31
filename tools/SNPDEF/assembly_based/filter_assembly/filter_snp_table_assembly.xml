@@ -1,4 +1,4 @@
-<tool id="Filter_snp_panel_assembly" name="filter_snp_panel_assembly" version="0.3">
+<tool id="Filter_snp_panel_assembly" name="filter_snp_panel_assembly" version="0.4">
     
     <description>Filtered SNP panel and fasta from assembies</description>
     
@@ -13,7 +13,6 @@
         -o output_file.fasta
         -t total.txt
         -r $remove
-        -n $no_hit
     </command>
 
     <inputs>
@@ -21,10 +20,6 @@
         <param name="remove" type="select" label="select false if you want to keep non-canonical" help="">
             <option value="True" selected='True'>True</option>
             <option value="False">False</option>
-        </param>
-        <param name="no_hit" type="select" label="keep no hits" help="">
-            <option value="Yes" selected='True'>Yes</option>
-            <option value="No">No</option>
         </param>
     </inputs>
 
@@ -40,7 +35,7 @@
 
 **What it does**
 
-Removes ambigous SNPs within the same genome and positions with option to remove no hit (default kept). Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies (default removed).
+Removes ambigous SNPs within the same genome and positions . Optional to remove SNPs derived from non-canonical nucleotides predicted from assemblies (default removed). If SNPs are used for phylogeny non-canonical nucleotides need to be removed.
 
 -----
 

@@ -3,11 +3,11 @@
 #########################################################################################
 #											#
 # Name	      :	filter_reads.py								#
-# Version     : 0.3								#
+# Version     : 0.4								#
 # Project     : SNPDEF							#
 # Description : Script to sort out no hits and get fasta		#
 # Author      : Brigida Rusconi								#
-# Date        : April 5th, 2018							#
+# Date        : May 31st, 2018							#
 #											#
 #########################################################################################
 #for replacement of a given value with NaN
@@ -113,7 +113,6 @@ parser.add_argument('-s', '--snp_table', help="snp table to sort")
 parser.add_argument('-t', '--total', help="inverted table to look at", default= "snp_filtered_table.txt")
 parser.add_argument('-r','--remove', help="remove non-canonical nucleotides", default= "False")
 parser.add_argument('-c','--recalculate', help="Were any genomes removed?", default= "No")
-parser.add_argument('-n','--no_hit', help="Keep no hits", default= "Yes")
 
 
 
@@ -123,7 +122,6 @@ input_file = args.snp_table
 output2_file = args.total
 remove=args.remove
 calc=args.recalculate
-no_h=args.no_hit
 #------------------------------------------------------------------------------------------
 
 
@@ -164,17 +162,12 @@ for i, v in enumerate(count_qbase):
 
 #print "Initial SNP count " + str(df.index.size)
 
-if no_h=="Yes":
-    df=df.replace({'No Hit':'N'},regex=True)
-#print "%s have only No Hits and were replaced with N" % (" ".join(setdiff1d(col_start,col_after).tolist()))
-#replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
-else:
-    ex=df
-    ex=ex.replace({'No SNP':'ZX'},regex=True)
-    ex=ex.replace({'No Hit':'ZX'},regex=True)
-    exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('ZX', case=False).any(), axis=1)]
-    df=df[~df.index.isin(exclude.index)]
-#print "%s have only No Hits and were removed" % (" ".join(setdiff1d(col_start,col_after).tolist()))
+
+ex=df
+ex=ex.replace({'No SNP':'ZX'},regex=True)
+ex=ex.replace({'No Hit':'ZX'},regex=True)
+exclude=ex[ex.apply(lambda row: row.astype(unicode).str.contains('ZX', case=False).any(), axis=1)]
+df=df[~df.index.isin(exclude.index)]
 
 
 
