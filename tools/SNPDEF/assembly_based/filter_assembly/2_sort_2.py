@@ -3,11 +3,11 @@
 #########################################################################################
 #											#
 # Name	      :	2_sort_2.py								#
-# Version     : 0.7									#
+# Version     : 0.8									#
 # Project     : sort & merge SNP tables							#
 # Description : Script to sort out no hits, indels, identical lines and double hits		#
 # Author      : Brigida Rusconi								#
-# Date        : May 31st, 2018							#
+# Date        : June 1st, 2018							#
 #											#
 #########################################################################################
 #for replacement of a given value with NaN
@@ -117,23 +117,19 @@ df=df.set_index(['molecule','refpos']).fillna('--')
 
 #------------------------------------------------------------------------------------------
 # only columns with qbase and refbase in table
-count_qbase=list(df.columns.values)
+count_qbase=df.columns.values.tolist()
 
 qindexes=[]
 for i, v in enumerate(count_qbase):
     if 'qbase:' in v:
         qindexes.append(i)
 df1=df.iloc[:,qindexes]
-
 #------------------------------------------------------------------------------------------
 #replaces lines with "No Hits" with NaN and removes lines with NaN in qbase columns
 
 df=df.mask(df=='No Hit').dropna()
 
-#print " No Hits and were replaced with N"
 
-#removes lines that had no hit because alignment was too short
-#df1=df1.mask(df1=='--').dropna()
 ref=df['refbase']
 df=df[df.index.isin(df1.index)]
 
@@ -205,31 +201,18 @@ cols=df3.columns
 if remove=="True":
     slash3=df3[~df3[cols].isin(bases).all(axis=1)].dropna(how='all')
     df3=df3[~df3.index.isin(slash3.index)]
-    for i in bases:
-        id=df1
-        id=id.replace({'N':i},regex=True)
-        id=id[id !=i].dropna(how='all')
-        df1=df1[df1.index.isin(id.index)]
+
 else:
     for i in bases:
-        slash2=slash2[slash2 !=i].dropna(how='all').fillna(i)
-        for i in bases:
-            id=df1
+            id=df3
             id=id.replace({'N':i},regex=True)
             id=id[id !=i].dropna(how='all')
-            df1=df1[df1.index.isin(id.index)]
-    
-#print "identical lines removed: SNP left " + str( slash2.index.size)
+            df3=df3[df3.index.isin(id.index)]
+                
+df2=df2[df2.index.isin(df3.index)]
 
-#------------------------------------------------------------------------------------------
-#replaces lines with indel
-
-indel=slash2.mask(slash2=='indel').dropna()
-
-
-#------------------------------------------------------------------------------------------
 #print "removed lines with short alignment %s lines left" % (str(indel.index.size))
-final2 =indel.reset_index(drop=True).T #drops indexes of molecule and refpos
+final2 =df3.reset_index(drop=True).T #drops indexes of molecule and refpos
 final2.reset_index(inplace=True)
 
 #-------------------------------------------------------------------------------------
@@ -258,24 +241,21 @@ with open('table','rU') as input:
 #------------------------------------------------------------------------------------------
 #recalculate snps/gene gene length and dn/ds and transition/transversion
 
-df=df[df.index.isin(indel.index)]
 
-df.drop(['snps_per_gene','snps/gene_length'],axis=1,inplace=True)
-temp=df.mask(df['gene_name']=='intergenic').dropna()
-snps_gene=temp.groupby('gene_name').size().reset_index()
+df2.drop(['snps_per_gene','snps/gene_length'],axis=1,inplace=True)
+temp1=df2.mask(df2['gene_name']=='intergenic').dropna()
+snps_gene=temp1.groupby('gene_name').size().reset_index()
 
 snps_gene2=dict(zip(snps_gene['gene_name'].tolist(),snps_gene[0].tolist()))
-df['snps_per_gene']=df['gene_name'].map(snps_gene2)
-df['snps/gene_length']=to_numeric(df['snps_per_gene'],errors='coerce').divide(to_numeric(df['gene_length'],errors='coerce'),axis=0)
+df2['snps_per_gene']=df2['gene_name'].map(snps_gene2)
+df2['snps/gene_length']=to_numeric(df2['snps_per_gene'],errors='coerce').divide(to_numeric(df2['gene_length'],errors='coerce'),axis=0)
 
 
-pdb.set_trace()
 #------------------------------------------------------------------------------------------
-cod=df.dropna(subset=['gene_name'])
+cod=df2.dropna(subset=['gene_name'])
 cod=cod.mask(cod['gene_name']=='intergenic').dropna()
 cod.reset_index(inplace=True)
 
-pdb.set_trace()
 count_qbase2=list(cod.columns.values)
 qindexes2=[]
 for i, v in enumerate(count_qbase2):
@@ -283,7 +263,7 @@ for i, v in enumerate(count_qbase2):
         qindexes2.append(i)
 
 # get query base information
-df3=cod.iloc[:,qindexes2].join(cod.refbase)
+df4=cod.iloc[:,qindexes2].join(cod.refbase)
 #position in codon
 def mod(x):
     t= x % 3
@@ -299,7 +279,7 @@ ref_codon=cod.ref_codon.astype(str).tolist()
 #get allele for each position
 
 
-snp_nb, idn =get_snp(df3)
+snp_nb, idn =get_snp(df4)
 
 
 query_codon=[]
@@ -332,34 +312,31 @@ for i,v in enumerate(query_codon):
         else:
             query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
 cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
-pdb.set_trace()
+
 cod.insert(cod.columns.size,'query_codon',query_codon)
 cod.insert(cod.columns.size,'query_aa',query_aa)
 
 #print "Read query codons and aa"
 #-------------------------------transition/transversion -------------------------------
-#
-df4=df.iloc[:,qindexes].join(df.refbase)
 
 
-snp_nb2, ident=get_snp(df4)
+snp_nb2, ident=get_snp(df3)
 ts_tv=[]
 for i,v in enumerate(snp_nb2):
     ts=[]
     if len(v)==1 and v[0]!= 'N':
-        ts_tv.append(get_trans_state(df.refbase[i],v[0]))
+        ts_tv.append(get_trans_state(df3.refbase[i],v[0]))
     else:
         for n in v:
             if n!='N':
-                ts.append(get_trans_state(df.refbase[i],n))
+                ts.append(get_trans_state(df3.refbase[i],n))
         ts_tv.append('/'.join(ts))
-df.drop(['query_codon','query_aa','transition/transversion','syn/nsyn/intergenic'],axis=1,inplace=True)
-df.insert(df.columns.size,'transition/transversion',ts_tv)
-#print "Read transition/transversion"
+df2.drop(['query_codon','query_aa','transition/transversion','syn/nsyn/intergenic'],axis=1,inplace=True)
+df2.insert(df2.columns.size,'transition/transversion',ts_tv)
 
 
 cod.set_index(['molecule','refpos'],inplace=True)
-fin=df.join(cod.loc[:,['query_codon','query_aa']])
+fin=df2.join(cod.loc[:,['query_codon','query_aa']])
 # -------------------------------synonymous nonsynonymous-------------------------------
 query_aa=fin.query_aa.astype(str).tolist()
 ref_aa=fin.ref_aa.astype(str).tolist()
@@ -394,7 +371,7 @@ fin.reset_index(inplace=True)
 fin.set_index('product',inplace=True)
 fin.replace({'syn?':genic},inplace=True)
 fin.reset_index(inplace=True)
-fin.set_index(['molecule','refpos'],inpace=True)
+fin.set_index(['molecule','refpos'],inplace=True)
 #SNPs that are actually identical are replaced with No SNP
 fin['syn?'][ident]='No SNP'
 fin.reset_index(inplace=True)
@@ -440,14 +417,14 @@ for i,v in enumerate(dn_2['gene_name']):
             dn_ds[v]=0
 
 fin['dn_ds']=fin['gene_name'].map(dn_ds)
-fin1=fin.iloc[:,1:(max(qindexes)+3)]
-fin1.set_index(['molecule','refpos'],inplace=True)
-fin2=fin.reindex_axis(['molecule','refpos','gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds'],axis=1)#'dn/ds'
-fin2.set_index(['molecule','refpos'],inplace=True)
+fin.set_index(['molecule','refpos'],inplace=True)
+fin1=fin.iloc[:,1:(max(qindexes)+2)]
+
+
+fin2=fin.reindex(['gene_name','gene_start','gene_end','gene_length','pos_in_gene','ref_codon','ref_aa','query_codon','query_aa','product','transition/transversion','snps_per_gene','snps/gene_length','dn_ds'],axis=1)#'dn/ds'
 final=fin1.join(fin2)
 final.reset_index(inplace=True)
 final.sort_values(by=['molecule','refpos'],inplace=True)
-
 #------------------------------------------------------------------------------------------
 #save total file for plotting -t option
 with open(output2_file,'w') as output2:
