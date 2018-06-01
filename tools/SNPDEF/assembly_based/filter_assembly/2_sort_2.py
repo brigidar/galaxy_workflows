@@ -3,7 +3,7 @@
 #########################################################################################
 #											#
 # Name	      :	2_sort_2.py								#
-# Version     : 0.8									#
+# Version     : 0.9									#
 # Project     : sort & merge SNP tables							#
 # Description : Script to sort out no hits, indels, identical lines and double hits		#
 # Author      : Brigida Rusconi								#
@@ -197,17 +197,21 @@ bases=['A','C','G','T','-']
 df3=df2.iloc[:,qindexes].join(df2.iloc[:,1])
 cols=df3.columns
 
-# remove non-canononical snps (optional)
+# remove non-canonical snps (optional)
 if remove=="True":
     slash3=df3[~df3[cols].isin(bases).all(axis=1)].dropna(how='all')
     df3=df3[~df3.index.isin(slash3.index)]
+    #remove identical locations
+    for i in bases:
+        id=df3
+        id=id[id !=i].dropna(how='all')
+        df3=df3[df3.index.isin(id.index)]
 
 else:
     for i in bases:
-            id=df3
-            id=id.replace({'N':i},regex=True)
-            id=id[id !=i].dropna(how='all')
-            df3=df3[df3.index.isin(id.index)]
+        id=df3
+        id=id[id !=i].dropna(how='all')
+        df3=df3[df3.index.isin(id.index)]
                 
 df2=df2[df2.index.isin(df3.index)]
 
@@ -300,19 +304,21 @@ for i,v in enumerate(snp_nb):
 
 query_aa=[]
 for i,v in enumerate(query_codon):
-    qq=[]
     if v=='nan':
         query_aa.append('nan')
     else:
-        if '/' in v:
+
+        if len(v.split('/'))==1:
+            query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
+        else:
+            qq=list()
             gl=v.split('/')
             for n in gl:
                 qq.append(str(Seq(n, generic_dna).translate(table=11)))
-                query_aa.append('/'.join(qq))
-        else:
-            query_aa.append(str(Seq(v, generic_dna).translate(table=11)))
-cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
+            query_aa.append('/'.join(qq))
 
+
+cod.drop(['query_codon','query_aa','transition/transversion'],axis=1,inplace=True)
 cod.insert(cod.columns.size,'query_codon',query_codon)
 cod.insert(cod.columns.size,'query_aa',query_aa)
 
