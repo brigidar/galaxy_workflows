@@ -192,7 +192,7 @@ df_l.reset_index(inplace=True)
 df_l1=df_l[df_l.index.isin(ind)]
 df2.set_index(['molecule','refpos'],inplace=True)
 df2.drop(df2.columns[bindexes],axis=1,inplace=True)
-f2.drop(df2.columns[mindexes],axis=1,inplace=True)
+df2.drop(df2.columns[mindexes],axis=1,inplace=True)
 
 #------------------------------------------------------------------------------------------
 # remove identical line
