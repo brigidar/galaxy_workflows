@@ -1,4 +1,4 @@
-<tool id="root_tree" name="reroot" version="0.1">
+<tool id="root_tree" name="reroot" version="0.2">
     
     <description>tree rerooting</description>
     
@@ -11,7 +11,7 @@
 
     <inputs>
         <param format="txt" name="tree" type="data" label="snp tree" help=""/>
-        <param name="start" type="text" label="Write 1st leaf name for rerooting" help=""/>
+        <param name="start" type="text" label="Write 1st leaf name for rerooting" help=""/ value="mid">
         <param name="stop" type="text" label="Write  2nd leaf name for rerooting" help=""/>
     </inputs>
 
@@ -27,7 +27,7 @@
         <![CDATA[
 **What it does**
 
-Places the root of the tree according to the leaf names provided.
+Places the root of the tree according to the leaf names provided. Default value mid roots the tree at the midpoint of the two most distant taxa.
 
 -----
 

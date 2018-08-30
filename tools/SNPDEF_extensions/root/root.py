@@ -3,11 +3,11 @@
 #########################################################################################
 #                                            #
 # Name          :    root.py                                #
-# Version     : 0.2                                    #
+# Version     : 0.3                                    #
 # Project     :  SNPDEF                          #
 # Description :  change location of bootstrap and root      #
 # Author      : Brigida Rusconi                                #
-# Date        : Sept 26th, 2017                            #
+# Date        : Aug 30th, 2018                            #
 #                                            #
 #########################################################################################
 
@@ -25,17 +25,13 @@ start=args.start
 stop=args.stop
 
 tree=Phylo.read(input_file,'newick')
-
-#for clade in tree.get_nonterminals():
-#    if clade.comment is None :
-#        continue
-#    else:
-#        clade.confidence=int(clade.comment)
-#        clade.comment=None
-
-tree.root_with_outgroup(start,stop)
-
-with open('tree.nwk','w') as output:
+if start="mid":
+    tree.root_at_midpoint()
+else:
+#pdb.set_trace()
+    tree.root_with_outgroup(start,stop)
+pdb.set_trace()
+with open('tree1.nwk','w') as output:
     Phylo.write(tree,output,'newick',format_branch_length='%1.10f')
 
 
